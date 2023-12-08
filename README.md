@@ -8,8 +8,9 @@ This package allows to adapt a GAMA simulation to a VR environment created with 
 
 ### Prerequisites
 
-Once the project is opened in Unity, you must install Newtonsoft Json by following the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM). It should fix all the errors caused by the package installation.  
-Additionaly, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
+Once the project is opened in Unity, if you have any errors, you can check the following points: 
+- Make sure that Newtonsoft Json is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
+- Additionaly, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
 
 ### What's included 
 
@@ -23,7 +24,11 @@ The project contains a basic scene with the required script and the following Ga
 
 ### Quick Start
 
-Once the repository is cloned, you can import it as a Unity project using the right Editor version and start working.
+1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version**.
+2. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.
+3. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
+4. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
+5. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
 
 ## Documentation
 
@@ -94,5 +99,75 @@ This is the core script of this package. It converts raw incoming json data into
 
 ## Tutorials
 
+### Displaying a UI dor a given game state
 
-## Improvements to implement 
+Let's assume that you've created a fancy startup UI that you wish to display at the launch of your app. To do that, apply the following steps:
+- In the GameObject MenuManager (child of the GameObject Managers), expand `All Overlays` menu
+- Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
+- From the Scene hierarchy, drag and drop the GameObject corresponding to your fancy UI
+- Expand `Associated Game States` menu
+- Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
+- Expand the list of game states to select the one during which you want to display your UI
+
+### Calibrating the coordinate system between GAMA and Unity
+
+In theory, the coordinate systems of GAMA and Unity are already aligned. However, for some reason (issues with the 3D elements added from external sources, redefinition of some parameters in GAMA) they may not match.  
+In that case, you can apply some position and rotation transformations to the agents and change the `Coordinate conversion parameters` in the GameObject `Game Manager` (child of GameObject `Managers`).
+
+### Hooking to a built-in event
+
+If you want to trigger an action when an event occurs (OnGameStateChanged for instance), proceed as follows:
+1. Subscribe to the event (here OnGameStateChanged) in the script in which you want to trigger the action:
+```csharp
+// #### Built-in Unity functions ####
+void OnEnable() {
+	SimulationManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+}
+
+// Unsubscribing is essential to avoid memory leaks
+void OnDisable() {
+	SimulationManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+}
+```
+
+2. Create the event handler function (i.e the function in which you define the actions to perform when the event is triggered):
+```csharp
+private void HandleGameStateChanged(GameState newState) {
+	if (newState == GameManager.GAME) {
+		// Do something
+	} else {
+		// Do something else
+	}
+}
+```
+
+:warning: For some reasons that are not yet explicable, if the actions defined within the event handler function are computationaly to heavy, then the handler function is not executed. Hence we propose a trick to overcome this issue :  
+
+
+1. Create two local variables, one boolean that will act as a signal and one that will hold the new value of the parameter of the event handler when the event is fired:
+```csharp
+private GameState currentState;
+private bool actionToPerformRequested;
+
+// Built-in Unity function
+void start() {
+	currentState = SimulationManager.Instance.GetCurrentState();
+	actionToPerformRequested = false;
+}
+```
+2. Keep the same subscription mechanism as developed above.
+3. Create the event handler and define the action in the Update loop:
+```csharp
+void Update() {
+	if (actionToPerformRequested) {
+		actionToPerformRequested = false;
+		PerformAction();
+	}
+}
+
+private void HandleGameStateChanged(GameState newState) {
+	if (newState == GameManager.GAME) {
+		actionToPerformRequested = true;
+	}
+}
+```
