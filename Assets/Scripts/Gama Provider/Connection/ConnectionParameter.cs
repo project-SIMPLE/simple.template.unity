@@ -11,9 +11,7 @@ public class ConnectionParameter
     public List<int> world;
     public bool physics;
 
-
-    public static ConnectionParameter CreateFromJSON(string jsonString)
-    {
+    public static ConnectionParameter CreateFromJSON(string jsonString) {
         return JsonUtility.FromJson<ConnectionParameter>(jsonString);
     }
 

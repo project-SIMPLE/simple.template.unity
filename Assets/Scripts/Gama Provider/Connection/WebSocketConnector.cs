@@ -55,36 +55,4 @@ public abstract class WebSocketConnector : MonoBehaviour
         string[] ipb = ip.Split(".");
         return (ipb.Length != 4);
     }
-
-    // (sender, e) =>
-        // {
-        //     if (e.IsText)
-        //     {
-        //         JObject jsonObj = JObject.Parse(e.Data);
-
-        //         if (jsonObj["id"] != null)
-        //         {
-                    
-        //             PlayerData tempPlayerData = JsonUtility.FromJson<PlayerData>(e.Data);
-        //             playerData = tempPlayerData;
-        //             Debug.Log("player ID is " + playerData.id);
-        //             return;
-        //         } 
-        //     }
-
-        // };
-
-        // if (player != null && playerData.id != "")
-        // {
-        //     playerData.xPos = player.transform.position.x;
-        //     playerData.yPos = player.transform.position.y;
-
-        //     System.DateTime epochStart =  new System.DateTime(1970, 1, 1, 8, 0, 0, System.DateTimeKind.Utc);
-        //     double timestamp = (System.DateTime.UtcNow - epochStart).TotalSeconds;
-        //     //Debug.Log(timestamp);
-        //     playerData.timestamp = timestamp;
-
-        //     string playerDataJSON = JsonUtility.ToJson(playerData);
-        //     socket.Send(playerDataJSON);
-        // }
 }

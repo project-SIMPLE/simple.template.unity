@@ -4,7 +4,7 @@ This package allows to adapt a GAMA simulation to a VR environment created with 
 
 ## Installation
 
-:warning: The package is being developped using Unity Editor3.5f. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
+:warning: The package is being developped using **Unity Editor3.5f**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
 
 ### Prerequisites
 
@@ -24,11 +24,17 @@ The project contains a basic scene with the required script and the following Ga
 
 ### Quick Start
 
-1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version**.
-2. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.
+1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version (Unity Editor3.5f)**.
+2. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.  
+![qs2](./ReadmeRes/qs-2.png)
 3. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
 4. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
 5. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
+6. Create in the scene an interactable component, for instance a Button. In the case of a Button, add an Item to the `OnClick` listener in the Inspector view.  
+![qs61](./ReadmeRes/qs-61.png)
+Then drag on drop in the `None (Object)` section the GameObject `Connection Manager`. Finally, in the dropdown menu, select `ConnectionManager > TryConnectionToServer()`  
+![qs62](./ReadmeRes/qs-62.png)
+7. Launch the middleware (refer to the dedicated documentation), GAMA and **make sure all the ports are correctly setup in the middleware**. Then launch the Unity App either Unity, or in the headset after having compiled it. By clicking on the button, the client (Unity app) should appear in the middleware monitor.
 
 ## Documentation
 
