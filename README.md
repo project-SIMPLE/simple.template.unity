@@ -12,7 +12,9 @@ Once the project is opened in Unity, if you have any errors, you can check the f
 - Make sure that Newtonsoft Json is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
 - Additionaly, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
 
-### What's included 
+To work properly, we assume that you already have a compatible GAMA model and tha you have installed the [Gama Server Middleware](https://github.com/project-SIMPLE/GamaServerMiddleware).
+
+### What is included 
 
 The project contains a basic scene with the required script and the following GameObjects:
 - Directional Light
@@ -25,13 +27,16 @@ The project contains a basic scene with the required script and the following Ga
 ### Quick Start
 
 1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version (Unity Editor3.5f)**.
+![qs1](./ReadmeRes/qs-1.png)
 2. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.  
 ![qs2](./ReadmeRes/qs-2.png)
 3. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
 4. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
+![qs3-4](./ReadmeRes/qs-3-4.png)
 5. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
+![qs5](./ReadmeRes/qs-5.png)
 6. Create in the scene an interactable component, for instance a Button. In the case of a Button, add an Item to the `OnClick` listener in the Inspector view.  
-![qs61](./ReadmeRes/qs-61.png)
+![qs61](./ReadmeRes/qs-61.png)  
 Then drag on drop in the `None (Object)` section the GameObject `Connection Manager`. Finally, in the dropdown menu, select `ConnectionManager > TryConnectionToServer()`  
 ![qs62](./ReadmeRes/qs-62.png)
 7. Launch the middleware (refer to the dedicated documentation), GAMA and **make sure all the ports are correctly setup in the middleware**. Then launch the Unity App either Unity, or in the headset after having compiled it. By clicking on the button, the client (Unity app) should appear in the middleware monitor.
@@ -108,12 +113,14 @@ This is the core script of this package. It converts raw incoming json data into
 ### Displaying a UI dor a given game state
 
 Let's assume that you've created a fancy startup UI that you wish to display at the launch of your app. To do that, apply the following steps:
-- In the GameObject MenuManager (child of the GameObject Managers), expand `All Overlays` menu
-- Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
-- From the Scene hierarchy, drag and drop the GameObject corresponding to your fancy UI
-- Expand `Associated Game States` menu
-- Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
-- Expand the list of game states to select the one during which you want to display your UI
+1. In the GameObject MenuManager (child of the GameObject Managers), expand `All Overlays` menu.  
+Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array  
+2. From the Scene hierarchy, drag and drop the GameObject corresponding to your fancy UI
+3. Expand `Associated Game States` menu.  
+Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
+4. Expand the list of game states to select the one during which you want to display your UI
+
+![t1](./ReadmeRes/t-1.png)
 
 ### Calibrating the coordinate system between GAMA and Unity
 
