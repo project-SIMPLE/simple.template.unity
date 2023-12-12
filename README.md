@@ -1,18 +1,20 @@
 # GAMA VR Provider
 
-This package allows to adapt a GAMA simulation to a VR environment created with Unity. It provides the VR developer with a game and connection management system, including GameObjects, methods and events that can be hooked. A list of these elements and how to use them is provided in the **Documentation** section.
+This package allows to adapt a GAMA simulation to a VR environment created with Unity. It provides the VR developer with a game and connection management system, including GameObjects, methods and events that can be hooked. A list of these elements and how to use them is provided in the [**Documentation**](#documentation) section.
 
 ## Installation
 
-:warning: The package is being developped using **Unity Editor3.5f**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
+> [!WARNING]
+> The package is being developped using **Unity Editor3.5f1**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
 
 ### Prerequisites
 
 Once the project is opened in Unity, if you have any errors, you can check the following points: 
-- Make sure that Newtonsoft Json is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
-- Additionaly, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
+- Make sure that **Newtonsoft Json** is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
+- To work properly, we assume that you already have a compatible GAMA model and tha you have installed the [**Gama Server Middleware**](https://github.com/project-SIMPLE/GamaServerMiddleware).
 
-To work properly, we assume that you already have a compatible GAMA model and tha you have installed the [Gama Server Middleware](https://github.com/project-SIMPLE/GamaServerMiddleware).
+> [!TIP]
+> **For Windows users**, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
 
 ### What is included 
 
@@ -28,23 +30,24 @@ The project contains a basic scene with the required script and the following Ga
 
 1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version (Unity Editor3.5f)**.
 ![qs1](./ReadmeRes/qs-1.png)
-2. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.  
+1. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.  
 ![qs2](./ReadmeRes/qs-2.png)
-3. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
-4. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
+1. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
+1. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
 ![qs3-4](./ReadmeRes/qs-3-4.png)
-5. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
+1. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
 ![qs5](./ReadmeRes/qs-5.png)
-6. Create in the scene an interactable component, for instance a Button. In the case of a Button, add an Item to the `OnClick` listener in the Inspector view.  
+1. Create in the scene an interactable component, for instance a Button. In the case of a Button, add an Item to the `OnClick` listener in the Inspector view.  
 ![qs61](./ReadmeRes/qs-61.png)  
 Then drag on drop in the `None (Object)` section the GameObject `Connection Manager`. Finally, in the dropdown menu, select `ConnectionManager > TryConnectionToServer()`  
 ![qs62](./ReadmeRes/qs-62.png)
-7. Launch the middleware (refer to the dedicated documentation), GAMA and **make sure all the ports are correctly setup in the middleware**. Then launch the Unity App either Unity, or in the headset after having compiled it. By clicking on the button, the client (Unity app) should appear in the middleware monitor.
+1. Launch the middleware (refer to the dedicated documentation), GAMA and **make sure all the ports are correctly setup in the middleware**. Then launch the Unity App either Unity, or in the headset after having compiled it. By clicking on the button, the client (Unity app) should appear in the middleware monitor.
 
 ## Documentation
 
 This section focuses only on the C# scripts which are useful for a Unity developer. The scripts not mentioned here are at least commented.  
 **Important note:** As all the scripts which name finishes by "Manager" are instantiated when Unity is launched in the "Managers" GameObject, they are all (except MenuManager) developed using the Singleton Pattern. Hence trying to instantiate in some external scripts could break the default mechanisms. To call a method from one of these classes, one should rather use the following code snippet :
+
 ```csharp
 NameOfClassManager.Instance.SomeMethod();
 ```
@@ -84,7 +87,8 @@ It is in charge of creating an ID for the player once the connection with GAMA i
 ### MenuManager
 
 As mentioned above this script is different from the other Managers as **it mustn't be instanciated at all** and it has no reason to be. It is only used to associate overlays with the GameStates during which they are displayed.  
-How it works is decribed in the Tutorials section.
+
+How it works is decribed in the [Tutorials section](#tutorials).
 
 ### SimulationManager
 
@@ -110,7 +114,7 @@ This is the core script of this package. It converts raw incoming json data into
 
 ## Tutorials
 
-### Displaying a UI dor a given game state
+### Displaying a UI for a given game state
 
 Let's assume that you've created a fancy startup UI that you wish to display at the launch of your app. To do that, apply the following steps:
 1. In the GameObject MenuManager (child of the GameObject Managers), expand `All Overlays` menu.  
@@ -154,7 +158,8 @@ private void HandleGameStateChanged(GameState newState) {
 }
 ```
 
-:warning: For some reasons that are not yet explicable, if the actions defined within the event handler function are computationaly to heavy, then the handler function is not executed. Hence we propose a trick to overcome this issue :  
+> [!WARNING]
+> For some reasons that are not yet explicable, if the actions defined within the event handler function are computationaly to heavy, then the handler function is not executed. Hence we propose a trick to overcome this issue :  
 
 
 1. Create two local variables, one boolean that will act as a signal and one that will hold the new value of the parameter of the event handler when the event is fired:
