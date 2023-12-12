@@ -51,12 +51,12 @@ public class SimulationManager : MonoBehaviour
     public static event Action<WorldJSONInfo> OnWorldDataReceived;
     // ########################################################################
 
-    private Timer timer;
     private List<Dictionary<int, GameObject>> agentMapList;
 
     // private bool geometriesInitialized;
-    private bool simulationParametersHandled;
     private bool handleGeometriesRequested;
+    private bool handlePlayerParametersRequested;
+    private bool handleGroundParametersRequested;
 
     private CoordinateConverter converter;
     private PolygonGenerator polyGen;
@@ -74,23 +74,33 @@ public class SimulationManager : MonoBehaviour
     }
 
     void OnEnable() {
-        ConnectionManager.Instance.OnServerMessageReceived += HandleServerMessageReceived;
-        ConnectionManager.Instance.OnConnectionAttempted += HandleConnectionAttempted;
-        ConnectionManager.Instance.OnConnectionStateChanged += HandleConnectionStateChanged;
+        if (ConnectionManager.Instance != null) {
+            ConnectionManager.Instance.OnServerMessageReceived += HandleServerMessageReceived;
+            ConnectionManager.Instance.OnConnectionAttempted += HandleConnectionAttempted;
+            ConnectionManager.Instance.OnConnectionStateChanged += HandleConnectionStateChanged;
+        } else {
+            Debug.Log("No connection manager");
+        }
     }
 
     void OnDisable() {
+        Debug.Log("SimulationManager: OnDisable");
         ConnectionManager.Instance.OnServerMessageReceived -= HandleServerMessageReceived;
         ConnectionManager.Instance.OnConnectionAttempted -= HandleConnectionAttempted;
         ConnectionManager.Instance.OnConnectionStateChanged -= HandleConnectionStateChanged;
     }
 
+    void OnDestroy () {
+        Debug.Log("SimulationManager: OnDestroy");
+    }
+
     void Start() {
         UpdateGameState(GameState.MENU);
         InitAgentsList();
-        timer = GetComponent<Timer>();
-        simulationParametersHandled = false;
         handleGeometriesRequested = false;
+        handlePlayerParametersRequested = false;
+        handleGroundParametersRequested = false;
+        // ConnectionManager.Instance.TryConnectionToServer();
     }
 
     void FixedUpdate() {
@@ -102,9 +112,19 @@ public class SimulationManager : MonoBehaviour
 
     void LateUpdate() {
 
-        if (handleGeometriesRequested && !simulationParametersHandled) {
+        if (handleGeometriesRequested) {
             InitGeometries();
             handleGeometriesRequested = false;
+        }
+
+        if (handlePlayerParametersRequested) {
+            InitPlayerParameters();
+            handlePlayerParametersRequested = false;
+        }
+
+        if (handleGroundParametersRequested) {
+            InitGroundParameters();
+            handleGroundParametersRequested = false;
         }
     }
 
@@ -113,35 +133,32 @@ public class SimulationManager : MonoBehaviour
         
         switch(newState) {
             case GameState.MENU:
-                Debug.Log("GameManager: UpdateGameState -> MENU");
+                Debug.Log("SimulationManager: UpdateGameState -> MENU");
                 break;
 
             case GameState.WAITING:
-                Debug.Log("GameManager: UpdateGameState -> WAITING");
+                Debug.Log("SimulationManager: UpdateGameState -> WAITING");
                 break;
 
             case GameState.LOADING_DATA:
-                Debug.Log("GameManager: UpdateGameState -> LOADING_DATA");
+                Debug.Log("SimulationManager: UpdateGameState -> LOADING_DATA");
                 ConnectionManager.Instance.SendExecutableExpression("do init_player(\"" + ConnectionManager.Instance.GetConnectionId() + "\");");
                 break;
 
             case GameState.GAME:
-                Debug.Log("GameManager: UpdateGameState -> GAME");
-                timer.SetTimerRunning(true);
+                Debug.Log("SimulationManager: UpdateGameState -> GAME");
                 break;
 
             case GameState.END:
-                timer.Reset();
-                Debug.Log("GameManager: UpdateGameState -> END");
+                Debug.Log("SimulationManager: UpdateGameState -> END");
                 break;
 
             case GameState.CRASH:
-                timer.Reset();
-                Debug.Log("GameManager: UpdateGameState -> CRASH");
+                Debug.Log("SimulationManager: UpdateGameState -> CRASH");
                 break;
 
             default:
-                Debug.Log("GameManager: UpdateGameState -> UNKNOWN");
+                Debug.Log("SimulationManager: UpdateGameState -> UNKNOWN");
                 break;
         }
         
@@ -165,28 +182,32 @@ public class SimulationManager : MonoBehaviour
                 Destroy(rigidBody);
             }
         }
-        Debug.Log("GameManager: Player parameters initialized");
+        Debug.Log("SimulationManager: Player parameters initialized");
     }
 
 
     private void InitGroundParameters() {
+        Debug.Log("GroundParameters : Beginnig ground initialization");
         if (Ground == null) {
-            Debug.LogError("GameManager: Ground not set");
+            Debug.LogError("SimulationManager: Ground not set");
             return;
         }
+        Debug.Log("GroundParameters : after first if statement");
         Vector3 ls = converter.fromGAMACRS(parameters.world[0], parameters.world[1]);
+        Debug.Log("GroundParameters : intialized ls vector");
         if (ls.z < 0)
             ls.z = -ls.z;
         if (ls.x < 0)
             ls.x = -ls.x;
         ls.y = groundY;
+        Debug.Log("GroundParameters : after next if statements");
         Ground.transform.localScale = ls;
-
+        Debug.Log("GroundParameters : after local scale transform");
         Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2);
         ps.y = -groundY;
 
         Ground.transform.position = ps;
-        Debug.Log("GameManager: Ground parameters initialized");
+        Debug.Log("SimulationManager: Ground parameters initialized");
     }
 
     private void InitGeometries() {
@@ -195,10 +216,9 @@ public class SimulationManager : MonoBehaviour
             polyGen.Init(converter, offsetYBackgroundGeom);
         }
         polyGen.GeneratePolygons(gamaGeometry);
-        // geometriesInitialized = true;
         OnGeometriesInitialized?.Invoke(gamaGeometry);
         UpdateGameState(GameState.GAME);
-        Debug.Log("GameManager: Geometries initialized");
+        Debug.Log("SimulationManager: Geometries initialized");
     }
 
     private void InitAgentsList() {
@@ -206,7 +226,7 @@ public class SimulationManager : MonoBehaviour
         foreach (GameObject i in Agents) {
             agentMapList.Add(new Dictionary<int, GameObject>());
         }
-        Debug.Log("GameManager: Agents list initialized. " + Agents.Count + " species found");
+        Debug.Log("SimulationManager: Agents list initialized. " + Agents.Count + " species found");
     }
 
 
@@ -235,6 +255,7 @@ public class SimulationManager : MonoBehaviour
 
         foreach (AgentInfo pi in infoWorld.agents) {
             int speciesIndex = pi.v[0];
+            // Debug.Log("Species index: " + speciesIndex);
             GameObject Agent = Agents[speciesIndex];
             int id = pi.v[1];
             GameObject obj = null;
@@ -275,7 +296,7 @@ public class SimulationManager : MonoBehaviour
     private void HandleConnectionStateChanged(ConnectionState state) {
         // player has been added to the simulation by the middleware
         if (state == ConnectionState.AUTHENTICATED) {
-            Debug.Log("GameManager: Player added to simulation, waiting for initial parameters");
+            Debug.Log("SimulationManager: Player added to simulation, waiting for initial parameters");
             UpdateGameState(GameState.LOADING_DATA);
         }
     }
@@ -285,18 +306,22 @@ public class SimulationManager : MonoBehaviour
         switch (firstKey) {
             // handle general informations about the simulation
             case "precision":
+
                 parameters = ConnectionParameter.CreateFromJSON(jsonObj.ToString());
                 converter = new CoordinateConverter(parameters.precision, GamaCRSCoefX, GamaCRSCoefY, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, GamaCRSOffsetZ);
-                Debug.Log("GameManager: Received simulation parameters");
+                Debug.Log("SimulationManager: Received simulation parameters");
                 // Init ground and player
-                await Task.Run(() => InitGroundParameters());
-                await Task.Run(() => InitPlayerParameters());    
+                // await Task.Run(() => InitGroundParameters());
+                // await Task.Run(() => InitPlayerParameters()); 
+                handlePlayerParametersRequested = true;   
+                handleGroundParametersRequested = true;
+                
             break;
 
             // handle geometries sent by GAMA at the beginning of the simulation
             case "points":
                 gamaGeometry = GAMAGeometry.CreateFromJSON(jsonObj.ToString());
-                Debug.Log("GameManager: Received geometries data");
+                Debug.Log("SimulationManager: Received geometries data");
                 handleGeometriesRequested = true;
             break;
 
@@ -307,16 +332,17 @@ public class SimulationManager : MonoBehaviour
             break;
 
             default:
-                Debug.LogError("GameManager: Received unknown message from middleware");
+                Debug.LogError("SimulationManager: Received unknown message from middleware");
                 break;
         }
 
     }
 
     private void HandleConnectionAttempted(bool success) {
+        Debug.Log("SimulationManager: Connection attempt " + (success ? "successful" : "failed"));
         if (success) {
             if(IsGameState(GameState.MENU)) {
-                Debug.Log("GameManager: Successfully connected to middleware");
+                Debug.Log("SimulationManager: Successfully connected to middleware");
                 UpdateGameState(GameState.WAITING);
             }
         } else {
@@ -343,10 +369,7 @@ public class SimulationManager : MonoBehaviour
     public bool IsGameState(GameState state) {
         return currentState == state;
     }
-    
-    public Timer GetTimer() {
-        return timer;
-    }
+
 
     public GameState GetCurrentState() {
         return currentState;

@@ -14,7 +14,7 @@ public abstract class WebSocketConnector : MonoBehaviour
     private WebSocket socket;
 
     void OnEnable() {
-        host = ValidIp(PlayerPrefs.GetString("IP")) ? PlayerPrefs.GetString("IP") : host;
+        // host = ValidIp(PlayerPrefs.GetString("IP")) ? PlayerPrefs.GetString("IP") : host;
         socket = new WebSocket("ws://" + host + ":" + port + "/");
         socket.OnOpen += HandleConnectionOpen;
         socket.OnMessage += HandleReceivedMessage;

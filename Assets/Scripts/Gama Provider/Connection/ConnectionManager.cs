@@ -29,6 +29,7 @@ public class ConnectionManager : WebSocketConnector
     
     // ############################################# UNITY FUNCTIONS #############################################
     void Awake() {
+        Debug.Log("ConnectionManager: Awake");
         Instance = this;
     }
 
@@ -65,6 +66,7 @@ public class ConnectionManager : WebSocketConnector
         }
 
         currentState = newState;
+        Debug.Log("ConnectionManager: Before trigger event " + currentState);
         OnConnectionStateChanged?.Invoke(newState);        
     }
 
@@ -93,7 +95,6 @@ public class ConnectionManager : WebSocketConnector
             switch(type) {
                 case "json_state":
                     OnConnectionStateReceived?.Invoke(jsonObj);
-                    Debug.Log("here");
                     bool authenticated = (bool) jsonObj["player"][connectionId]["authentified"];
                     bool connected = (bool) jsonObj["player"][connectionId]["connected"];
 

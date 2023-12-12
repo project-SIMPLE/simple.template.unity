@@ -24,7 +24,6 @@ public class ToggleHeight : MonoBehaviour
 
     void OnEnable() {
         toggleHeightAction.action.performed += HandleToggleHeight;
-
     }
 
     void OnDisable() {

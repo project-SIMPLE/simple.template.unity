@@ -244,7 +244,7 @@ public class PolyExtruder : MonoBehaviour
         MeshFilter mfB = goB.AddComponent<MeshFilter>();
         if(this.isUsingColliders) goB.AddComponent<MeshCollider>();
         bottomMeshRenderer = goB.AddComponent<MeshRenderer>();
-        bottomMeshRenderer.material = new Material(Shader.Find("Standard"));
+        bottomMeshRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 
         // keep reference to bottom mesh
         this.bottomMesh = mfB.mesh;
@@ -312,7 +312,7 @@ public class PolyExtruder : MonoBehaviour
 			MeshFilter mfT = goT.AddComponent<MeshFilter>();
 			if(this.isUsingColliders) goT.AddComponent<MeshCollider>();
 			topMeshRenderer = goT.AddComponent<MeshRenderer>();
-			topMeshRenderer.material = new Material(Shader.Find("Standard"));
+			topMeshRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 			
 			// keep reference to top mesh
 			this.topMesh = mfT.mesh;
@@ -363,7 +363,7 @@ public class PolyExtruder : MonoBehaviour
 			goS.name = "surround_" + this.prismName;
 			MeshFilter mfS = goS.AddComponent<MeshFilter>();
 			surroundMeshRenderer = goS.AddComponent<MeshRenderer>();
-			surroundMeshRenderer.material = new Material(Shader.Find("Standard"));
+			surroundMeshRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 			
 			// keep reference to surrounding mesh
 			this.surroundMesh = mfS.mesh;
@@ -560,7 +560,7 @@ public class PolyExtruder : MonoBehaviour
         outlineRenderer.startWidth = outlineWidth;
         outlineRenderer.endWidth = outlineWidth;
         outlineRenderer.useWorldSpace = false;
-        outlineRenderer.material = new Material(Shader.Find("Standard"));
+        outlineRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
         outlineRenderer.material.color = outlineColor;
 
         // prepare original polygon vertices for LineRenderer positions
