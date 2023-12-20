@@ -8,9 +8,9 @@ using WebSocketSharp;
 public abstract class WebSocketConnector : MonoBehaviour
 {
 
-    [SerializeField] private string host = "localhost";
-    [SerializeField] private int port = 8000;
-    
+    [SerializeField] protected string host = "localhost";
+    [SerializeField] protected int port = 8000;
+     
     private WebSocket socket;
 
     void OnEnable() {

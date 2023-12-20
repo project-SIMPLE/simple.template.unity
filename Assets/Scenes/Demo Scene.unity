@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18018535, g: 0.22559482, b: 0.30677685, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028326, g: 0.22571333, b: 0.30692202, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!20 &74123530 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2126558141099834225, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
+  m_PrefabInstance: {fileID: 1641816073}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &74457057
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,7 +485,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 50}
+  m_SizeDelta: {x: 100, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &462070858
 MonoBehaviour:
@@ -599,7 +604,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: host
-      value: 10.0.209.132
+      value: 10.0.8.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: port
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -942,7 +951,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1446223250
 RectTransform:
   m_ObjectHideFlags: 0
@@ -950,9 +959,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446223249}
-  m_LocalRotation: {x: -0.101128794, y: -0.0043492853, z: -0.00044210878, w: 0.99486375}
-  m_LocalPosition: {x: 0, y: 0, z: 6.6}
-  m_LocalScale: {x: 0.07239902, y: 0.07239902, z: 0.07239902}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 462070857}
@@ -961,9 +970,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: -11.608, y: -0.501, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.67, y: 3.52}
-  m_SizeDelta: {x: 100, y: 52.0605}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &1446223251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -993,7 +1002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -1003,7 +1012,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!223 &1446223253
 Canvas:
   m_ObjectHideFlags: 0
@@ -1013,15 +1022,15 @@ Canvas:
   m_GameObject: {fileID: 1446223249}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 2
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 74123530}
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1148,7 +1157,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 50}
+  m_SizeDelta: {x: 100, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1843128124
 MonoBehaviour:

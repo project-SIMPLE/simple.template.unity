@@ -142,7 +142,8 @@ public class SimulationManager : MonoBehaviour
 
             case GameState.LOADING_DATA:
                 Debug.Log("SimulationManager: UpdateGameState -> LOADING_DATA");
-                ConnectionManager.Instance.SendExecutableExpression("do init_player(\"" + ConnectionManager.Instance.GetConnectionId() + "\");");
+                if (ConnectionManager.Instance.getUseMiddleware()) 
+                    ConnectionManager.Instance.SendExecutableExpression("do init_player(\"" + ConnectionManager.Instance.GetConnectionId() + "\");");
                 break;
 
             case GameState.GAME:

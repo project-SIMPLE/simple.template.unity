@@ -21,7 +21,7 @@ public class WorldJSONInfo
     public static WorldJSONInfo CreateFromJSON(string jsonString)
     {
         return JsonUtility.FromJson<WorldJSONInfo>(jsonString);
-    }
+    } 
 
 }
 
