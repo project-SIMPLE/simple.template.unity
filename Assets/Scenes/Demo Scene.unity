@@ -485,7 +485,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 200}
+  m_SizeDelta: {x: 100, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &462070858
 MonoBehaviour:
@@ -951,7 +951,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1446223250
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1049,12 +1049,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2451526830340777802, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
+      propertyPath: speed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2451526830340777802, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
       propertyPath: stick
       value: 
       objectReference: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     - target: {fileID: 2451526830340777802, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2451526830340777802, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
+      propertyPath: speedRotation
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5434048020941396157, guid: ee1629b1bd0fa411cad31dd2c9898fad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1157,7 +1165,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 200}
+  m_SizeDelta: {x: 100, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1843128124
 MonoBehaviour:

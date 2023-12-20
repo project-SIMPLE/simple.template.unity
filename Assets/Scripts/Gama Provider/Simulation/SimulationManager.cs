@@ -256,7 +256,6 @@ public class SimulationManager : MonoBehaviour
 
         foreach (AgentInfo pi in infoWorld.agents) {
             int speciesIndex = pi.v[0];
-            // Debug.Log("Species index: " + speciesIndex);
             GameObject Agent = Agents[speciesIndex];
             int id = pi.v[1];
             GameObject obj = null;
@@ -302,13 +301,21 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    private async void HandleServerMessageReceived(JObject jsonObj) {
-        string firstKey = jsonObj.Properties().Select(p => p.Name).FirstOrDefault();
+    private async void HandleServerMessageReceived(String firstKey, String content) {
+        if (firstKey == null)
+        {
+            if (content.Contains("agents"))
+                firstKey = "agents";
+            else if (content.Contains("points"))
+                firstKey = "points";
+            else if (content.Contains("precision"))
+                firstKey = "precision";
+        }
         switch (firstKey) {
             // handle general informations about the simulation
             case "precision":
 
-                parameters = ConnectionParameter.CreateFromJSON(jsonObj.ToString());
+                parameters = ConnectionParameter.CreateFromJSON(content);
                 converter = new CoordinateConverter(parameters.precision, GamaCRSCoefX, GamaCRSCoefY, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, GamaCRSOffsetZ);
                 Debug.Log("SimulationManager: Received simulation parameters");
                 // Init ground and player
@@ -317,18 +324,18 @@ public class SimulationManager : MonoBehaviour
                 handlePlayerParametersRequested = true;   
                 handleGroundParametersRequested = true;
                 
-            break;
+            break; 
 
             // handle geometries sent by GAMA at the beginning of the simulation
             case "points":
-                gamaGeometry = GAMAGeometry.CreateFromJSON(jsonObj.ToString());
+                gamaGeometry = GAMAGeometry.CreateFromJSON(content);
                 Debug.Log("SimulationManager: Received geometries data");
                 handleGeometriesRequested = true;
             break;
 
             // handle agents while simulation is running
             case "agents":
-                infoWorld = WorldJSONInfo.CreateFromJSON(jsonObj.ToString());                
+                infoWorld = WorldJSONInfo.CreateFromJSON(content);                
                 OnWorldDataReceived?.Invoke(infoWorld);
             break;
 

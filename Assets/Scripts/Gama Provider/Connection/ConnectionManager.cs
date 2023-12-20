@@ -5,6 +5,10 @@ using UnityEngine;
 using WebSocketSharp;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using UnityEngine.SceneManagement;
+using Unity.Collections;
+using System.Linq;
+using System.Threading.Tasks;
 
 public class ConnectionManager : WebSocketConnector
 {
@@ -18,7 +22,7 @@ public class ConnectionManager : WebSocketConnector
     public event Action<ConnectionState> OnConnectionStateChanged;
 
     // called when a "json_simulation" message is received
-    public event Action<JObject> OnServerMessageReceived;
+    public event Action<String, String> OnServerMessageReceived;
 
     // called when a "json_state" message is received 
     public event Action<JObject> OnConnectionStateReceived;
@@ -92,16 +96,12 @@ public class ConnectionManager : WebSocketConnector
 
     protected override void HandleReceivedMessage(object sender, MessageEventArgs e)
     {
-        Debug.Log("e: " + e);
         if (e.IsText)
         {
             JObject jsonObj = JObject.Parse(e.Data);
-            Debug.Log("data: " + e.Data);
             string type = (string)jsonObj["type"];
-            Debug.Log("type: " + type);
-
-            Debug.Log("jsonObj: " + jsonObj);
-
+           
+        
             if (UseMiddleware)
             {
                 switch (type)
@@ -139,20 +139,22 @@ public class ConnectionManager : WebSocketConnector
 
                     case "json_simulation":
                         JObject content = (JObject)jsonObj["contents"];
-                        OnServerMessageReceived?.Invoke(content);
+                        String firstKey = jsonObj.Properties().Select(pp => pp.Name).FirstOrDefault();
+
+                        OnServerMessageReceived?.Invoke(firstKey, content.ToString());
                         break;
 
                     default:
                         break;
                 }
-            }
+            } 
             else
             {
                 switch (type)
-                {
+                { 
                     case "SimulationOutput":
-                        JObject content = (JObject)jsonObj["contents"];
-                        OnServerMessageReceived?.Invoke(content);
+                        JValue content = (JValue) jsonObj["content"];
+                        OnServerMessageReceived?.Invoke(null, content.ToString());
                         break;
                     default:
                         break;
@@ -221,11 +223,8 @@ public class ConnectionManager : WebSocketConnector
 
 
         string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
-        Debug.Log("ICI");
         SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
             if (!success) {
-                Debug.Log("LA");
-
                 Debug.LogError("ConnectionManager: Failed to send executable expression");
             }
         }));
