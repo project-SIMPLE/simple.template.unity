@@ -215,17 +215,29 @@ public class ConnectionManager : WebSocketConnector
     public void SendExecutableExpression(string expression) {
         Dictionary<string, string> jsonExpression = null;
         jsonExpression = new Dictionary<string, string> {
-             {"type", "expression"},
-             {"expr", expression}
-             };
-
-
-
+            {"type", "expression"},
+            {"expr", expression}
+        };
 
         string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
         SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
             if (!success) {
                 Debug.LogError("ConnectionManager: Failed to send executable expression");
+            }
+        }));
+    }
+
+    public void DisconnectProperly() {
+        Dictionary<string,string> jsonExpression = new Dictionary<string,string> {
+            {"type", "disconnect_properly"}
+        };
+        string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
+        SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
+            if (!success) {
+                Debug.LogError("ConnectionManager: Failed to send disconnect message");
+            }
+            else {
+                DisconnectFromServer();
             }
         }));
     }
