@@ -38,7 +38,7 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private float groundY = 1.0f;
 
     //Y-offset to apply to the background geometries
-    [SerializeField] private float offsetYBackgroundGeom = 0.1f;
+    [SerializeField] private float offsetYBackgroundGeom = 0.0f;
 
     // ################################ EVENTS ################################
     // called when the current game state changes
@@ -95,7 +95,7 @@ public class SimulationManager : MonoBehaviour
     }
 
     void Start() {
-        UpdateGameState(GameState.MENU);
+      //  UpdateGameState(GameState.MENU);
         InitAgentsList();
         handleGeometriesRequested = false;
         handlePlayerParametersRequested = false;

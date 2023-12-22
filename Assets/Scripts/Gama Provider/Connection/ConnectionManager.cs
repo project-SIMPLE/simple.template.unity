@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 public class ConnectionManager : WebSocketConnector
 {
+    [SerializeField]
     private bool UseMiddleware = false;
 
     private ConnectionState currentState;
@@ -47,6 +48,7 @@ public class ConnectionManager : WebSocketConnector
         }
         UpdateConnectionState(ConnectionState.DISCONNECTED);
         connectionRequested = false;
+
     }
 
     
@@ -65,6 +67,7 @@ public class ConnectionManager : WebSocketConnector
                 break;
             case ConnectionState.DISCONNECTED:
                 Debug.Log("ConnectionManager: UpdateConnectionState -> DISCONNECTED");
+                TryConnectionToServer();
                 break;
             default:
                 break;

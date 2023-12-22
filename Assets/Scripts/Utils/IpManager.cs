@@ -66,10 +66,17 @@ public class IpManager : MonoBehaviour
         if (ready) {
             PlayerPrefs.SetString("IP", playerTextOutput.text);
             PlayerPrefs.Save();
+            SceneManager.LoadScene("Startup Menu");
         }
     }
 
-    public void OnTriggerEnterCancel() {}
+    public void OnTriggerEnterCancel() {
+
+        if (ready)
+        {
+            SceneManager.LoadScene("Startup Menu");
+        }
+    }
     
 
     public void OnTriggerEnterDelete() {
