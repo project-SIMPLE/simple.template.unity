@@ -1,19 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using UnityEngine.SceneManagement;
-using Unity.Collections;
 using System.Linq;
-using System.Threading.Tasks;
 
 public class ConnectionManager : WebSocketConnector
 {
-    [SerializeField]
-    private bool UseMiddleware = false;
 
     private ConnectionState currentState;
     private string connectionId;
@@ -32,10 +26,16 @@ public class ConnectionManager : WebSocketConnector
     public event Action<bool> OnConnectionAttempted;
 
     public static ConnectionManager Instance = null;
+
+    //use to seperate messages in the case where the middleware is not used
+    private String MessageSeparator = "|||";
     
     // ############################################# UNITY FUNCTIONS #############################################
     void Awake() {
-        Debug.Log("ConnectionManager: Awake");
+        UseMiddleware = true;// PlayerPrefs.GetString("MIDDLEWARE").Equals("Y");
+        Debug.Log("ConnectionManager: Awake : " + PlayerPrefs.GetString("MIDDLEWARE"));
+        Debug.Log("ConnectionManager Awake host: " + PlayerPrefs.GetString("IP") + " PORT: " + PlayerPrefs.GetString("PORT") + " UseMiddleware: "+ UseMiddleware);
+
         Instance = this;
     }
 
@@ -46,6 +46,7 @@ public class ConnectionManager : WebSocketConnector
             connectionId = Guid.NewGuid().ToString();
             PlayerPrefs.SetString("CONNECT_ID", connectionId);
         }
+        Debug.Log("START");
         UpdateConnectionState(ConnectionState.DISCONNECTED);
         connectionRequested = false;
 
@@ -54,8 +55,9 @@ public class ConnectionManager : WebSocketConnector
     
     // ############################################# CONNECTION HANDLER #############################################
     public void UpdateConnectionState(ConnectionState newState) {
+        Debug.Log("ConnectionManager: Before trigger event " + currentState);
 
-        switch(newState) {
+        switch (newState) {
             case ConnectionState.PENDING:
                 Debug.Log("ConnectionManager: UpdateConnectionState -> PENDING");
                 break;
@@ -74,7 +76,6 @@ public class ConnectionManager : WebSocketConnector
         }
 
         currentState = newState;
-        Debug.Log("ConnectionManager: Before trigger event " + currentState);
         OnConnectionStateChanged?.Invoke(newState);        
     }
 
@@ -99,6 +100,7 @@ public class ConnectionManager : WebSocketConnector
 
     protected override void HandleReceivedMessage(object sender, MessageEventArgs e)
     {
+        
         if (e.IsText)
         {
             JObject jsonObj = JObject.Parse(e.Data);
@@ -138,12 +140,11 @@ public class ConnectionManager : WebSocketConnector
                             }
 
                         } 
-                        break;
+                        break;  
 
                     case "json_simulation":
                         JObject content = (JObject)jsonObj["contents"];
-                        String firstKey = jsonObj.Properties().Select(pp => pp.Name).FirstOrDefault();
-
+                        String firstKey = content.Properties().Select(pp => pp.Name).FirstOrDefault();
                         OnServerMessageReceived?.Invoke(firstKey, content.ToString());
                         break;
 
@@ -151,26 +152,22 @@ public class ConnectionManager : WebSocketConnector
                         break;
                 }
             } 
-            else
+            else if (type.Equals("SimulationOutput"))
             {
-                switch (type)
-                { 
-                    case "SimulationOutput":
-                        JValue content = (JValue) jsonObj["content"];
-                        OnServerMessageReceived?.Invoke(null, content.ToString());
-                        break;
-                    default:
-                        break;
-
+                JValue content = (JValue)jsonObj["content"];
+               // Debug.Log("MessageSeparator: " + MessageSeparator);
+                foreach (String mes in content.ToString().Split(MessageSeparator))
+                {
+                    if (!mes.IsNullOrEmpty())
+                        OnServerMessageReceived?.Invoke(null, mes);
                 }
-
             }
         }
     }
 
     protected override void HandleConnectionClosed(object sender, CloseEventArgs e) {
         // checks if the connection was closed just after a connection request
-        Debug.Log("HandleConnectionClosed");
+        Debug.Log("ConnectionManager: HandleConnectionClosed");
         if (connectionRequested) {
             connectionRequested = false;
             OnConnectionAttempted?.Invoke(false);
@@ -182,17 +179,23 @@ public class ConnectionManager : WebSocketConnector
     // ############################################# UTILITY FUNCTIONS #############################################
     public void TryConnectionToServer() {
         if(IsConnectionState(ConnectionState.DISCONNECTED)) {
-            Debug.Log("ConnectionManager: Attempting to connect to middleware...");
+            Debug.Log("ConnectionManager: Attempting to connect to middleware: ws://" + host + ":" + port + "/");
             connectionRequested = true;
             UpdateConnectionState(ConnectionState.PENDING);
+
             GetSocket().Connect();
              
-            if (! UseMiddleware) 
+            if (! UseMiddleware)  
             {
-                ConnectionManager.Instance.SendExecutableExpression("do create_player(\"" + ConnectionManager.Instance.GetConnectionId() + "\");");
+                Debug.Log("Create player direct :" + ConnectionManager.Instance.GetConnectionId());
 
-                UpdateConnectionState(ConnectionState.AUTHENTICATED);
-                Debug.Log("ws://" + host + ":" + port + "/");
+                  Dictionary<string, string> args = new Dictionary<string, string> {
+                    {"id", "\""+ConnectionManager.Instance.GetConnectionId()+"\""}
+                  };
+                  SendExecutableAsk("create_init_player", args);
+
+                 
+                UpdateConnectionState(ConnectionState.AUTHENTICATED); 
 
             }
         } else {
@@ -230,6 +233,27 @@ public class ConnectionManager : WebSocketConnector
         }));
     }
 
+    public void SendExecutableAsk(string action, Dictionary<string,string> arguments)
+    {
+        string argsJSON = JsonConvert.SerializeObject(arguments);
+        Dictionary<string, string> jsonExpression = null;
+        jsonExpression = new Dictionary<string, string> {
+            {"type", "ask"},
+            {"action", action},
+            {"args", argsJSON},
+            {"agent", "simulation[0].unity_linker[0]" }
+        };
+
+        string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
+
+        SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
+            if (!success)
+            {
+                Debug.LogError("ConnectionManager: Failed to send executable expression");
+            }
+        }));
+    }
+
     public void DisconnectProperly() {
         Dictionary<string,string> jsonExpression = new Dictionary<string,string> {
             {"type", "disconnect_properly"}
@@ -254,6 +278,8 @@ public class ConnectionManager : WebSocketConnector
     {
         return UseMiddleware;
     }
+
+    
 }
 
 

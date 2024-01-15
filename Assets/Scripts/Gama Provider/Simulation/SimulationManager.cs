@@ -1,12 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.Collections;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 
 public class SimulationManager : MonoBehaviour
 {
@@ -14,14 +9,13 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject Ground;
     [SerializeField] private List<GameObject> Agents;
-    [SerializeField] private TMPro.TextMeshProUGUI infoText;
 
     // optional: rotation, Y-translation and Size scale to apply to the prefabs correspoding to the different species of agents
     [Header("Transformations applied to agents prefabs")]
     [SerializeField] private List<float> rotations = new List<float> { 90.0f, 90.0f, 0.0f };
     [SerializeField] private List<float> rotationsCoeff = new List<float> { 1, 1, 0.0f };
     [SerializeField] private List<float> YValues = new List<float> { -0.9f, -0.9f, 0.15f };
-    [SerializeField] private List<float> Sizefactor = new List<float> { 0.3f, 0.3f, 1.0f }; 
+    [SerializeField] private List<float> Sizefactor = new List<float> { 0.3f, 0.3f, 1.0f };  
 
     // optional: define a scale between GAMA and Unity for the location given
     [Header("Coordinate conversion parameters")]
@@ -95,38 +89,38 @@ public class SimulationManager : MonoBehaviour
     }
 
     void Start() {
-      //  UpdateGameState(GameState.MENU);
         InitAgentsList();
         handleGeometriesRequested = false;
         handlePlayerParametersRequested = false;
         handleGroundParametersRequested = false;
-        // ConnectionManager.Instance.TryConnectionToServer();
     }
 
     void FixedUpdate() {
-        if(IsGameState(GameState.GAME)) {
-            UpdatePlayerPosition();
-            UpdateAgentsList();
-        }
-    }
-
-    void LateUpdate() {
-
-        if (handleGeometriesRequested) {
-            InitGeometries();
-            handleGeometriesRequested = false;
-        }
-
-        if (handlePlayerParametersRequested) {
+        if (handlePlayerParametersRequested)
+        {
             InitPlayerParameters();
             handlePlayerParametersRequested = false;
         }
 
-        if (handleGroundParametersRequested) {
+        if (handleGroundParametersRequested)
+        {
             InitGroundParameters();
             handleGroundParametersRequested = false;
         }
+        if (handleGeometriesRequested)
+        {
+            InitGeometries();
+            handleGeometriesRequested = false;
+        }
+        if (IsGameState(GameState.GAME)) {
+            UpdatePlayerPosition();
+
+            if (infoWorld != null)
+                UpdateAgentsList();
+        }
     }
+
+  
 
     // ############################################ GAMESTATE UPDATER ############################################
     public void UpdateGameState(GameState newState) {    
@@ -142,8 +136,13 @@ public class SimulationManager : MonoBehaviour
 
             case GameState.LOADING_DATA:
                 Debug.Log("SimulationManager: UpdateGameState -> LOADING_DATA");
-                if (ConnectionManager.Instance.getUseMiddleware()) 
-                    ConnectionManager.Instance.SendExecutableExpression("do init_player(\"" + ConnectionManager.Instance.GetConnectionId() + "\");");
+                if (ConnectionManager.Instance.getUseMiddleware())
+                {
+                    Dictionary<string, string> args = new Dictionary<string, string> {
+                         {"id", ConnectionManager.Instance.GetConnectionId() }
+                    };
+                    ConnectionManager.Instance.SendExecutableAsk("send_init_data", args);
+                }
                 break;
 
             case GameState.GAME:
@@ -164,7 +163,7 @@ public class SimulationManager : MonoBehaviour
         }
         
         currentState = newState;
-        OnGameStateChanged?.Invoke(currentState);
+        OnGameStateChanged?.Invoke(currentState); 
     }
 
     
@@ -173,16 +172,6 @@ public class SimulationManager : MonoBehaviour
     private void InitPlayerParameters() {
         Vector3 pos = converter.fromGAMACRS(parameters.position[0], parameters.position[1]);
         player.transform.position = pos;
-
-        if (parameters.physics) {
-            if (!player.TryGetComponent(out Rigidbody rigidBody)) {
-                player.AddComponent<Rigidbody>();
-            }
-        } else {
-            if (player.TryGetComponent(out Rigidbody rigidBody)) {
-                Destroy(rigidBody);
-            }
-        }
         Debug.Log("SimulationManager: Player parameters initialized");
     }
 
@@ -193,19 +182,14 @@ public class SimulationManager : MonoBehaviour
             Debug.LogError("SimulationManager: Ground not set");
             return;
         }
-        Debug.Log("GroundParameters : after first if statement");
         Vector3 ls = converter.fromGAMACRS(parameters.world[0], parameters.world[1]);
-        Debug.Log("GroundParameters : intialized ls vector");
         if (ls.z < 0)
             ls.z = -ls.z;
         if (ls.x < 0)
             ls.x = -ls.x;
         ls.y = groundY;
-        Debug.Log("GroundParameters : after next if statements");
         Ground.transform.localScale = ls;
-        Debug.Log("GroundParameters : after local scale transform");
         Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2);
-        ps.y = -groundY;
 
         Ground.transform.position = ps;
         Debug.Log("SimulationManager: Ground parameters initialized");
@@ -229,7 +213,7 @@ public class SimulationManager : MonoBehaviour
         }
         Debug.Log("SimulationManager: Agents list initialized. " + Agents.Count + " species found");
     }
-
+     
 
     // ############################################ UPDATERS ############################################
     private void UpdatePlayerPosition() {
@@ -243,11 +227,22 @@ public class SimulationManager : MonoBehaviour
         int angle = (int) (((s > 0) ? -1.0 : 1.0) * (180 / Math.PI) * Math.Acos(c) * parameters.precision);
 
         List<int> p = converter.toGAMACRS(Camera.main.transform.position);
-        ConnectionManager.Instance.SendExecutableExpression("do move_player_external($id," + p[0] + "," + p[1] + "," + angle + ");");
-    }
+        Dictionary<string, string> args = new Dictionary<string, string> {
+            {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") },
+            {"x", "" +p[0]},
+            {"y", "" +p[1]},
+            {"angle", "" +angle}
+        };
+
+        ConnectionManager.Instance.SendExecutableAsk("move_player_external", args);
+     }
 
     private void UpdateAgentsList() {
-
+        if (infoWorld.position != null && infoWorld.position.Count > 1)
+        {
+            Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1]);
+            player.transform.position = pos;
+        }
         foreach (Dictionary<int, GameObject> agentMap in agentMapList) {
             foreach (GameObject obj in agentMap.Values) {
                 obj.SetActive(false);
@@ -290,6 +285,7 @@ public class SimulationManager : MonoBehaviour
                 }
             }
         }
+        infoWorld = null;
     }
 
     // ############################################# HANDLERS ########################################
@@ -299,24 +295,28 @@ public class SimulationManager : MonoBehaviour
             Debug.Log("SimulationManager: Player added to simulation, waiting for initial parameters");
             UpdateGameState(GameState.LOADING_DATA);
         }
-    }
+    } 
 
     private async void HandleServerMessageReceived(String firstKey, String content) {
+
         if (firstKey == null)
         {
             if (content.Contains("agents"))
-                firstKey = "agents";
+                firstKey = "agents"; 
             else if (content.Contains("points"))
                 firstKey = "points";
             else if (content.Contains("precision"))
                 firstKey = "precision";
+           
         }
+        
         switch (firstKey) {
             // handle general informations about the simulation
             case "precision":
 
                 parameters = ConnectionParameter.CreateFromJSON(content);
                 converter = new CoordinateConverter(parameters.precision, GamaCRSCoefX, GamaCRSCoefY, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, GamaCRSOffsetZ);
+               
                 Debug.Log("SimulationManager: Received simulation parameters");
                 // Init ground and player
                 // await Task.Run(() => InitGroundParameters());
@@ -335,12 +335,13 @@ public class SimulationManager : MonoBehaviour
 
             // handle agents while simulation is running
             case "agents":
-                infoWorld = WorldJSONInfo.CreateFromJSON(content);                
-                OnWorldDataReceived?.Invoke(infoWorld);
-            break;
+                if (infoWorld == null) { 
+                    infoWorld = WorldJSONInfo.CreateFromJSON(content);
+                }
+             break;
 
             default:
-                Debug.LogError("SimulationManager: Received unknown message from middleware");
+                Debug.LogError("SimulationManager: Received unknown message: " + content);
                 break;
         }
 
@@ -355,19 +356,12 @@ public class SimulationManager : MonoBehaviour
             }
         } else {
             // stay in MENU state
-            DisplayInfoText("Unable to connect to middleware", Color.red);
+            Debug.Log("Unable to connect to middleware");
         }
     }
 
     // ############################################# UTILITY FUNCTIONS ########################################
-    public void DisplayInfoText(string text, Color color) {
-        infoText.text = text;
-        infoText.color = color;
-    }
-
-    public void RemoveInfoText() {
-        DisplayInfoText("", new Color(0,0,0,0));
-    }    
+    
 
     public void RestartGame() {
         OnGameRestarted?.Invoke();        
@@ -395,6 +389,6 @@ public enum GameState {
     LOADING_DATA,
     // connected to middleware, authenticated, initial data received, simulation running
     GAME,
-    END,
+    END, 
     CRASH
 }

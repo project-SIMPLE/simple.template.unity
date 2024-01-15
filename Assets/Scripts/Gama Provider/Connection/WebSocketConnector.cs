@@ -8,27 +8,44 @@ using WebSocketSharp;
 public abstract class WebSocketConnector : MonoBehaviour
 {
 
-    [SerializeField] protected string host = "localhost";
-    [SerializeField] protected int port = 8000;
-     
-    private WebSocket socket;
+     protected string host ;
+     protected string port;
+
+    protected bool UseMiddleware;
+
+    private WebSocket socket; 
+
+    private bool DesktopMode = true;
 
     void OnEnable() {
-        // host = ValidIp(PlayerPrefs.GetString("IP")) ? PlayerPrefs.GetString("IP") : host;
+       
+        Debug.Log("WebSocketConnector OnEnable host: " + PlayerPrefs.GetString("IP") + " PORT: " + PlayerPrefs.GetString("PORT") + " MIDDLEWARE:" + PlayerPrefs.GetString("MIDDLEWARE"));
+        port = PlayerPrefs.GetString("PORT"); 
+        host = PlayerPrefs.GetString("IP");
+
+        if (DesktopMode)
+        {
+            UseMiddleware = true;
+            host = "localhost";
+
+            if (UseMiddleware)
+            {
+                port = "8080";
+            }
+            else
+            {
+                port = "1000";
+            }
+            
+        }  
+      
         socket = new WebSocket("ws://" + host + ":" + port + "/");
         socket.OnOpen += HandleConnectionOpen;
         socket.OnMessage += HandleReceivedMessage;
         socket.OnClose += HandleConnectionClosed;
     }
-    
-    void Update() {
-        if (socket == null) {
-            Debug.Log("Socket is null");
-            return;
-        }
-    }
 
-    void OnDestroy() {
+   void OnDestroy() {
         socket.Close();
     }
 

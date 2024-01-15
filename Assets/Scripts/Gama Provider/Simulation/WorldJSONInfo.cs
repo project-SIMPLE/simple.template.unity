@@ -8,14 +8,7 @@ public class WorldJSONInfo
     public List<AgentInfo> agents;
     public List<BuildingInfo> buildings;
     public List<int> position;
-    public int pollution;
-    public float aqimean;
-    // public float aqimax;
-    public float aqistd;
-    public float roadClosedDist;
-    public float pAreaHigh;
-    public float pAreaMid;
-    public float pAreaLow;
+   
 
 
     public static WorldJSONInfo CreateFromJSON(string jsonString)

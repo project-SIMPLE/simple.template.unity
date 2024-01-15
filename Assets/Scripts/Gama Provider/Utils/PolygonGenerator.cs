@@ -8,8 +8,8 @@ public class PolygonGenerator
 {
     CoordinateConverter converter;
     float offsetYBackgroundGeom;
-    private Dictionary<int, GameObject> geometriesMap3D;
-    private Dictionary<int, GameObject> geometriesMap2D;
+    //private Dictionary<int, GameObject> geometriesMap3D;
+   // private Dictionary<int, GameObject> geometriesMap2D;
 
     private static PolygonGenerator instance;
 
@@ -18,8 +18,8 @@ public class PolygonGenerator
     public void Init(CoordinateConverter c, float Yoffset) {
         converter = c;
         offsetYBackgroundGeom = Yoffset;
-        geometriesMap3D = new Dictionary<int, GameObject>();
-        geometriesMap2D = new Dictionary<int, GameObject>();
+       // geometriesMap3D = new Dictionary<int, GameObject>();
+      //  geometriesMap2D = new Dictionary<int, GameObject>();
     }
 
     public static PolygonGenerator GetInstance() {
@@ -40,11 +40,11 @@ public class PolygonGenerator
         GameObject generated3D = new GameObject();
         generated3D.name = "Generated 3D geometries";
 
-
+    
         List<Vector2> pts = new List<Vector2>();
         int cpt = 0;
-        int id2D = 0;
-        int id3D = 0;
+       // int id2D = 0;
+       // int id3D = 0;
         for (int i = 0; i < geom.points.Count; i++)
         {
             GAMAPoint pt = geom.points[i];
@@ -62,12 +62,12 @@ public class PolygonGenerator
                     GameObject p = GeneratePolygon(MeshDataPoints, name, tag, extrusionHeight, isUsingCollider, is3D);
                     if (geom.is3D[cpt]) {
                         p.transform.SetParent(generated3D.transform);
-                        geometriesMap3D.Add(id3D, p);
-                        id3D++;
+                   //     geometriesMap3D.Add(id3D, p);
+                       // id3D++;
                     } else {
                         p.transform.SetParent(generated2D.transform);
-                        geometriesMap2D.Add(id2D, p);
-                        id2D++;
+                     //   geometriesMap2D.Add(id2D, p);
+                      //  id2D++;
                     }
                 }
                 pts = new List<Vector2>();
@@ -106,15 +106,15 @@ public class PolygonGenerator
         pos.y += offsetYBackgroundGeom;
         polyExtruderGO.transform.position = pos;
         polyExtruder.createPrism(polyExtruderGO.name, extrusionHeight, MeshDataPoints, Color.grey, is3D, isUsingBottomMeshIn3D, isUsingCollider);
-        // if (isUsingCollider)
-        // {
-        //     MeshCollider mc = polyExtruderGO.AddComponent<MeshCollider>();
-        //     mc.sharedMesh = polyExtruder.surroundMesh;
-        // }
+        if (isUsingCollider)
+         {
+             MeshCollider mc = polyExtruderGO.AddComponent<MeshCollider>();
+             mc.sharedMesh = polyExtruder.surroundMesh;
+         }
         return polyExtruderGO;
     }
 
-    public Dictionary<int, GameObject> GetGeneratedGeometries3D()
+   /* public Dictionary<int, GameObject> GetGeneratedGeometries3D()
     {
         return geometriesMap3D;
     }
@@ -122,7 +122,7 @@ public class PolygonGenerator
     public Dictionary<int, GameObject> GetGeneratedGeometries2D()
     {
         return geometriesMap2D;
-    }
+    }*/
 
     // public static void SetGeneratedBuildings(Dictionary<int, GameObject> buildings)
     // {
