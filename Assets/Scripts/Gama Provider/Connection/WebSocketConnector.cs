@@ -13,9 +13,12 @@ public abstract class WebSocketConnector : MonoBehaviour
 
     protected bool UseMiddleware;
 
-    private WebSocket socket; 
+    private WebSocket socket;
 
-    private bool DesktopMode = true;
+    protected bool DesktopMode = true;
+    protected bool UseMiddlewareDM = false; //only for Desktop mode
+
+
 
     void OnEnable() {
        
@@ -25,7 +28,7 @@ public abstract class WebSocketConnector : MonoBehaviour
 
         if (DesktopMode)
         {
-            UseMiddleware = true;
+            UseMiddleware = UseMiddlewareDM;
             host = "localhost";
 
             if (UseMiddleware)

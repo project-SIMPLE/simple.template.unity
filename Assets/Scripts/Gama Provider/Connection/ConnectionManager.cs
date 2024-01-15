@@ -29,10 +29,12 @@ public class ConnectionManager : WebSocketConnector
 
     //use to seperate messages in the case where the middleware is not used
     private String MessageSeparator = "|||";
+
+    private String AgentToSendInfo = "simulation[0].unity_linker[0]";
     
     // ############################################# UNITY FUNCTIONS #############################################
     void Awake() {
-        UseMiddleware = true;// PlayerPrefs.GetString("MIDDLEWARE").Equals("Y");
+        UseMiddleware = DesktopMode ? UseMiddlewareDM : PlayerPrefs.GetString("MIDDLEWARE").Equals("Y");
         Debug.Log("ConnectionManager: Awake : " + PlayerPrefs.GetString("MIDDLEWARE"));
         Debug.Log("ConnectionManager Awake host: " + PlayerPrefs.GetString("IP") + " PORT: " + PlayerPrefs.GetString("PORT") + " UseMiddleware: "+ UseMiddleware);
 
@@ -241,7 +243,7 @@ public class ConnectionManager : WebSocketConnector
             {"type", "ask"},
             {"action", action},
             {"args", argsJSON},
-            {"agent", "simulation[0].unity_linker[0]" }
+            {"agent", AgentToSendInfo }
         };
 
         string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
