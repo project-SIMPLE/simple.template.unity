@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class SimulationManager : MonoBehaviour
 {
@@ -62,6 +63,9 @@ public class SimulationManager : MonoBehaviour
 
     public static SimulationManager Instance = null;
 
+    public float timeWithoutInteraction = 1.0f; //in second
+    public float remainingTime = 0.0f;
+
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
         Instance = this;
@@ -93,6 +97,12 @@ public class SimulationManager : MonoBehaviour
         handleGeometriesRequested = false;
         handlePlayerParametersRequested = false;
         handleGroundParametersRequested = false;
+    }
+
+    private void Update()
+    {
+        if (remainingTime > 0)
+            remainingTime -= Time.deltaTime;
     }
 
     void FixedUpdate() {
@@ -198,7 +208,8 @@ public class SimulationManager : MonoBehaviour
     private void InitGeometries() {
         if (polyGen == null) {
             polyGen = PolygonGenerator.GetInstance();
-            polyGen.Init(converter, offsetYBackgroundGeom);
+            Debug.Log("player.GetComponentInChildren<XRInteractionManager>(): " + player.GetComponentInChildren<XRInteractionManager>());
+            polyGen.Init(converter, offsetYBackgroundGeom, this, player.GetComponentInChildren<XRInteractionManager>());
         }
         polyGen.GeneratePolygons(gamaGeometry);
         OnGeometriesInitialized?.Invoke(gamaGeometry);
@@ -295,7 +306,38 @@ public class SimulationManager : MonoBehaviour
             Debug.Log("SimulationManager: Player added to simulation, waiting for initial parameters");
             UpdateGameState(GameState.LOADING_DATA);
         }
-    } 
+    }
+
+    public void SelectInteraction(SelectEnterEventArgs ev)
+    {
+
+        if (remainingTime <= 0.0)
+        {
+            Transform grabbedObject = ev.interactableObject.transform;
+            Debug.Log("Interaction : " + grabbedObject.gameObject);
+
+            if (("block").Equals(grabbedObject.gameObject.tag))
+            {
+                Dictionary<string, string> args = new Dictionary<string, string> {
+                         {"id", grabbedObject.gameObject.name }
+                    };
+                ConnectionManager.Instance.SendExecutableAsk("update_hotspot", args);
+
+                Renderer[] renderers = grabbedObject.gameObject.GetComponentsInChildren<Renderer>();
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    Debug.Log("renderers[i]: " + renderers[i]);
+
+                    Debug.Log("materials[i].color before: " + renderers[i].material.color);
+                    renderers[i].material.color = renderers[i].material.color == Color.red ? Color.gray : Color.red;
+                    Debug.Log("materials[i].color after: " + renderers[i].material.color);
+                }
+                remainingTime = timeWithoutInteraction;
+            }
+        }
+        
+    }
+     
 
     private async void HandleServerMessageReceived(String firstKey, String content) {
 

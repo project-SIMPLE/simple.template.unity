@@ -42,7 +42,7 @@ public class MenuController : MonoBehaviour
     {
         useMiddleWare = m_Toggle.isOn;
         string port = useMiddleWare ? portWithMiddleware : portWithoutMiddleware;
-        textMP.text = "Current IP: " + PlayerPrefs.GetString("IP") + "/" + port;
+        textMP.text = "Current IP: " + PlayerPrefs.GetString("IP") + ":" + port;
 
     }
     public void StartBtn()

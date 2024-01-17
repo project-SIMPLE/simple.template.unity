@@ -15,7 +15,7 @@ public abstract class WebSocketConnector : MonoBehaviour
 
     private WebSocket socket;
 
-    protected bool DesktopMode = true;
+    protected bool DesktopMode = false;
     protected bool UseMiddlewareDM = false; //only for Desktop mode
 
 

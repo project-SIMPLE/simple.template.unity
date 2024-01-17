@@ -12,6 +12,7 @@ public class GAMAGeometry
     public List<string> names;
     public List<string> tags;
     public List<bool> is3D;
+    public List<bool> isInteractables;
 
     public static GAMAGeometry CreateFromJSON(string jsonString)
     {

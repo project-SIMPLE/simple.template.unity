@@ -1,12 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading.Tasks;
+using UnityEngine.XR.Interaction.Toolkit;
+
 
 public class PolygonGenerator
 {
     CoordinateConverter converter;
+    SimulationManager simuManager;
+    XRInteractionManager interactionManager;
+
     float offsetYBackgroundGeom;
     //private Dictionary<int, GameObject> geometriesMap3D;
    // private Dictionary<int, GameObject> geometriesMap2D;
@@ -15,11 +18,13 @@ public class PolygonGenerator
 
     private PolygonGenerator() {}
 
-    public void Init(CoordinateConverter c, float Yoffset) {
+    public void Init(CoordinateConverter c, float Yoffset, SimulationManager simulationManager, XRInteractionManager interManager) {
         converter = c;
         offsetYBackgroundGeom = Yoffset;
+        simuManager = simulationManager;
+        interactionManager = interManager;
        // geometriesMap3D = new Dictionary<int, GameObject>();
-      //  geometriesMap2D = new Dictionary<int, GameObject>();
+       //  geometriesMap2D = new Dictionary<int, GameObject>();
     }
 
     public static PolygonGenerator GetInstance() {
@@ -32,6 +37,8 @@ public class PolygonGenerator
     public static void DestroyInstance() {
         instance = null;
     }
+
+    
 
     public void GeneratePolygons(GAMAGeometry geom)
     {
@@ -58,8 +65,19 @@ public class PolygonGenerator
                     float extrusionHeight = geom.heights[cpt];
                     bool isUsingCollider = geom.hasColliders[cpt];
                     bool is3D = geom.is3D[cpt];
+                    bool isInteractable = geom.isInteractables[cpt];
+
                     // GameObject p = GeneratePolygon(pts.ToArray(), geom.names.Count > 0 ?  geom.names[cpt] : "", geom.tags.Count > 0 ?  geom.tags[cpt] : "", geom.heights[cpt], geom.hasColliders[cpt], geom.is3D[cpt]);
                     GameObject p = GeneratePolygon(MeshDataPoints, name, tag, extrusionHeight, isUsingCollider, is3D);
+                    if (isInteractable == true)
+                    {
+                        XRSimpleInteractable interaction = p.AddComponent<XRSimpleInteractable>();
+
+                        interaction.interactionManager = interactionManager;
+                        interaction.selectEntered.AddListener(simuManager.SelectInteraction);
+                        MeshCollider col = p.GetComponent<MeshCollider>();
+                        col.convex = true;
+                    }
                     if (geom.is3D[cpt]) {
                         p.transform.SetParent(generated3D.transform);
                    //     geometriesMap3D.Add(id3D, p);
@@ -79,6 +97,7 @@ public class PolygonGenerator
         }
     }
 
+
     // Start is called before the first frame update
     GameObject GeneratePolygon(Vector2[] MeshDataPoints, string name, string tag, float extrusionHeight, bool isUsingCollider, bool is3D) {
         bool isUsingBottomMeshIn3D = false;
@@ -89,9 +108,9 @@ public class PolygonGenerator
         if (name != "")
             polyExtruderGO.name = name;
         
-        if (tag != "") {
+        if (tag != null && !string.IsNullOrEmpty( tag )) {
             polyExtruderGO.tag = tag;
-            // polyExtruderGO.layer = Layer Mask.NameToLayer(tag);
+            //polyExtruderGO.layer = Layer Mask.NameToLayer(tag);
         }
 
         // reference to setup example poly extruder 
