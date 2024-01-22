@@ -47,6 +47,7 @@ public class SimulationManager : MonoBehaviour
     // ########################################################################
 
     private List<Dictionary<int, GameObject>> agentMapList;
+    private List<GameObject> SelectedObjects;
 
     // private bool geometriesInitialized;
     private bool handleGeometriesRequested;
@@ -69,6 +70,7 @@ public class SimulationManager : MonoBehaviour
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
         Instance = this;
+        SelectedObjects = new List<GameObject>();
     }
 
     void OnEnable() {
@@ -308,32 +310,59 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
+
+  
+
+    public void HoverEnterInteraction(HoverEnterEventArgs ev)
+    {
+         
+        GameObject obj = ev.interactableObject.transform.gameObject;
+
+        ChangeColor(obj, Color.blue);
+    }
+
+    public void HoverExitInteraction(HoverExitEventArgs ev)
+    {
+        GameObject obj = ev.interactableObject.transform.gameObject;
+        bool isSelected = SelectedObjects.Contains(obj); 
+
+        ChangeColor(obj, isSelected ? Color.red : Color.gray);
+    }
+
     public void SelectInteraction(SelectEnterEventArgs ev)
     {
 
         if (remainingTime <= 0.0)
         {
-            Transform grabbedObject = ev.interactableObject.transform;
+            GameObject grabbedObject = ev.interactableObject.transform.gameObject;
 
-            if (("block").Equals(grabbedObject.gameObject.tag))
+            if (("selectable").Equals(grabbedObject.tag))
             {
                 Dictionary<string, string> args = new Dictionary<string, string> {
-                         {"id", grabbedObject.gameObject.name }
+                         {"id", grabbedObject.name }
                     };
                 ConnectionManager.Instance.SendExecutableAsk("update_hotspot", args);
+                bool newSelection = !SelectedObjects.Contains(grabbedObject);
+                if (newSelection)
+                    SelectedObjects.Add(grabbedObject);
+                else
+                    SelectedObjects.Remove(grabbedObject);
+                ChangeColor(grabbedObject, newSelection ? Color.red : Color.gray);
 
-                Renderer[] renderers = grabbedObject.gameObject.GetComponentsInChildren<Renderer>();
-                for (int i = 0; i < renderers.Length; i++)
-                {
-                    renderers[i].material.color = renderers[i].material.color == Color.red ? Color.gray : Color.red;
-                }
                 remainingTime = timeWithoutInteraction;
             }
         }
         
     }
      
-
+    static public void ChangeColor(GameObject obj, Color color) 
+    {
+        Renderer[] renderers = obj.gameObject.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            renderers[i].material.color = color;// renderers[i].material.color == Color.red ? Color.gray : Color.red;
+        }
+    }
     private async void HandleServerMessageReceived(String firstKey, String content) {
 
         if (firstKey == null)

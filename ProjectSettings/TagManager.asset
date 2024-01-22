@@ -8,6 +8,7 @@ TagManager:
   - Anchor
   - useMiddleWare
   - block
+  - selectable
   layers:
   - Default
   - TransparentFX

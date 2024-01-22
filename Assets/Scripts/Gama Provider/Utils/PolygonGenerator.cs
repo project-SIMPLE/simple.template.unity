@@ -75,7 +75,14 @@ public class PolygonGenerator
 
                         interaction.interactionManager = interactionManager;
                         if (simuManager != null)
+                        {
                             interaction.selectEntered.AddListener(simuManager.SelectInteraction);
+                           
+                            interaction.firstHoverEntered.AddListener(simuManager.HoverEnterInteraction);
+                            interaction.hoverExited.AddListener(simuManager.HoverExitInteraction);
+                        } 
+                            
+
                        // MeshCollider col = p.GetComponent<MeshCollider>();
                       //  col.convex = true;
                     }
