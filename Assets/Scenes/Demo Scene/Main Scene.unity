@@ -152,7 +152,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -386,6 +386,10 @@ PrefabInstance:
       propertyPath: offsetYBackgroundGeom
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: primaryRightHandButton
+      value: 
+      objectReference: {fileID: 3951697458631832198, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: rotations.Array.data[2]
       value: 90

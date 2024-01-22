@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.InputSystem;
 
 public class SimulationManager : MonoBehaviour
 {
+    [SerializeField] private InputActionReference primaryRightHandButton;
+
     [Header("Base GameObjects")]
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject Ground;
@@ -67,6 +70,8 @@ public class SimulationManager : MonoBehaviour
     public float timeWithoutInteraction = 1.0f; //in second
     public float remainingTime = 0.0f;
 
+    private bool isNight = false;
+
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
         Instance = this;
@@ -105,6 +110,10 @@ public class SimulationManager : MonoBehaviour
     {
         if (remainingTime > 0)
             remainingTime -= Time.deltaTime;
+        if (primaryRightHandButton != null && primaryRightHandButton.action.triggered)
+        {
+            TriggerMainButton();
+        }
     }
 
     void FixedUpdate() {
@@ -132,7 +141,16 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-  
+
+    public void TriggerMainButton()
+    {
+        isNight = !isNight;
+        Light[] lights = FindObjectsOfType(typeof(Light)) as Light[];
+        foreach (Light light in lights)
+        {
+            light.intensity = isNight ? 0 : 1.0f;
+        }
+    }
 
     // ############################################ GAMESTATE UPDATER ############################################
     public void UpdateGameState(GameState newState) {    
