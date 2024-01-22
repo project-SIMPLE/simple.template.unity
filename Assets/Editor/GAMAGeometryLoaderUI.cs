@@ -5,18 +5,18 @@ using UnityEditor;
 public class GAMAGeometryLoaderUI : EditorWindow
 {
     public string ip = "localhost";
-    public int port = 8000;
-    public float GamaCRSCoefX = 0.49f;//1.0f;
-    public float GamaCRSCoefY = -0.49f;//1.0f;
+    public string port = "1000";
+    public float GamaCRSCoefX = 1.0f;
+    public float GamaCRSCoefY = 1.0f;
     public float offsetYBackgroundGeom = 0.0f;
-    public float GamaCRSOffsetX = 12.0f;
-    public float GamaCRSOffsetY = -10.0f;
+    public float GamaCRSOffsetX = 0.0f;
+    public float GamaCRSOffsetY = 0.0f;
     /*  public string GamaPath = " bash /Applications/Gama.app/Contents/headless/gama-headless.sh";
       public string GamaModelPath = "/Users/patricktaillandier/Documents/GitHub/simple.universe.template_/Template GAMA model/Utilities/SentGemetriesToUnity.gaml";
       public string GamaExperiment = "sendGeometriesToUnity_batch";
       public bool runGAMA = false;
     */
-    //private GAMAGeometryLoader loader;
+    private GAMAGeometryLoader loader;
 
 
     void OnGUI()
@@ -26,7 +26,7 @@ public class GAMAGeometryLoaderUI : EditorWindow
         GUILayout.Space(10);
         ip = EditorGUILayout.TextField("IP: ", ip);
         GUILayout.Space(10);
-        port = int.Parse(EditorGUILayout.TextField("Port: ", port + ""));
+        port = (EditorGUILayout.TextField("Port: ", port ));
         GUILayout.Space(10);
         GamaCRSCoefX = float.Parse(EditorGUILayout.TextField("X-scaling: ", GamaCRSCoefX + ""));
         GUILayout.Space(10);
@@ -67,15 +67,15 @@ public class GAMAGeometryLoaderUI : EditorWindow
                
 
             }*/
+             
 
-
-           // loader = FindAnyObjectByType<GAMAGeometryLoader>();
-           // loader.GenerateGeometries(ip, port, GamaCRSCoefX, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, offsetYBackgroundGeom);
+            loader = new GAMAGeometryLoader(); 
+             loader.GenerateGeometries(ip, port, GamaCRSCoefX, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, offsetYBackgroundGeom);
 
 
             Close();
-        }
+        } 
         if (GUILayout.Button("Cancel")) Close();
         EditorGUILayout.EndHorizontal();
     }
-}
+} 

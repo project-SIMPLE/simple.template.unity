@@ -314,7 +314,6 @@ public class SimulationManager : MonoBehaviour
         if (remainingTime <= 0.0)
         {
             Transform grabbedObject = ev.interactableObject.transform;
-            Debug.Log("Interaction : " + grabbedObject.gameObject);
 
             if (("block").Equals(grabbedObject.gameObject.tag))
             {
@@ -326,11 +325,7 @@ public class SimulationManager : MonoBehaviour
                 Renderer[] renderers = grabbedObject.gameObject.GetComponentsInChildren<Renderer>();
                 for (int i = 0; i < renderers.Length; i++)
                 {
-                    Debug.Log("renderers[i]: " + renderers[i]);
-
-                    Debug.Log("materials[i].color before: " + renderers[i].material.color);
                     renderers[i].material.color = renderers[i].material.color == Color.red ? Color.gray : Color.red;
-                    Debug.Log("materials[i].color after: " + renderers[i].material.color);
                 }
                 remainingTime = timeWithoutInteraction;
             }

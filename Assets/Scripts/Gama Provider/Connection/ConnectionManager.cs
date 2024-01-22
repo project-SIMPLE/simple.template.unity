@@ -183,7 +183,7 @@ public class ConnectionManager : WebSocketConnector
     // ############################################# UTILITY FUNCTIONS #############################################
     public void TryConnectionToServer() {
         if(IsConnectionState(ConnectionState.DISCONNECTED)) {
-            Debug.Log("ConnectionManager: Attempting to connect to middleware: ws://" + host + ":" + port + "/");
+            Debug.Log("ConnectionManager: Attempting to connect to " + (UseMiddleware?"middleware":"GAMA")+ ": ws://" + host + ":" + port + "/");
             connectionRequested = true;
             UpdateConnectionState(ConnectionState.PENDING);
 

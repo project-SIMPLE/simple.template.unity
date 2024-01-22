@@ -16,7 +16,7 @@ public class PolygonGenerator
 
     private static PolygonGenerator instance;
 
-    private PolygonGenerator() {}
+    public PolygonGenerator() {}
 
     public void Init(CoordinateConverter c, float Yoffset, SimulationManager simulationManager, XRInteractionManager interManager) {
         converter = c;
@@ -74,9 +74,10 @@ public class PolygonGenerator
                         XRSimpleInteractable interaction = p.AddComponent<XRSimpleInteractable>();
 
                         interaction.interactionManager = interactionManager;
-                        interaction.selectEntered.AddListener(simuManager.SelectInteraction);
-                        MeshCollider col = p.GetComponent<MeshCollider>();
-                        col.convex = true;
+                        if (simuManager != null)
+                            interaction.selectEntered.AddListener(simuManager.SelectInteraction);
+                       // MeshCollider col = p.GetComponent<MeshCollider>();
+                      //  col.convex = true;
                     }
                     if (geom.is3D[cpt]) {
                         p.transform.SetParent(generated3D.transform);
