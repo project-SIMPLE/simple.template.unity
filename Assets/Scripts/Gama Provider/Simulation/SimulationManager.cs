@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit; 
 using UnityEngine.InputSystem;
-
+ 
 public class SimulationManager : MonoBehaviour
-{
+{ 
     [SerializeField] private InputActionReference primaryRightHandButton;
 
     [Header("Base GameObjects")]
@@ -31,9 +31,6 @@ public class SimulationManager : MonoBehaviour
     // Z offset and scale
     [SerializeField] private float GamaCRSOffsetZ = 180.0f;
     // [SerializeField] private float GamaCRSCoefZ = 1.0f;
-
-    //Y scale for the ground
-    [SerializeField] private float groundY = 1.0f;
 
     //Y-offset to apply to the background geometries
     [SerializeField] private float offsetYBackgroundGeom = 0.0f;
@@ -68,7 +65,7 @@ public class SimulationManager : MonoBehaviour
     public static SimulationManager Instance = null;
 
     public float timeWithoutInteraction = 1.0f; //in second
-    public float remainingTime = 0.0f;
+    private float remainingTime = 0.0f;
 
     private bool isNight = false;
 
@@ -127,11 +124,13 @@ public class SimulationManager : MonoBehaviour
         {
             InitGroundParameters();
             handleGroundParametersRequested = false;
+            UpdateGameState(GameState.GAME);
         }
         if (handleGeometriesRequested)
         {
             InitGeometries();
             handleGeometriesRequested = false;
+
         }
         if (IsGameState(GameState.GAME)) {
             UpdatePlayerPosition();
@@ -201,6 +200,7 @@ public class SimulationManager : MonoBehaviour
     // ############################# INITIALIZERS ####################################
     private void InitPlayerParameters() {
         Vector3 pos = converter.fromGAMACRS(parameters.position[0], parameters.position[1]);
+        pos.y = player.transform.position.y;
         player.transform.position = pos;
         Debug.Log("SimulationManager: Player parameters initialized");
     }
@@ -217,7 +217,6 @@ public class SimulationManager : MonoBehaviour
             ls.z = -ls.z;
         if (ls.x < 0)
             ls.x = -ls.x;
-        ls.y = groundY;
         Ground.transform.localScale = ls;
         Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2);
 
@@ -233,7 +232,7 @@ public class SimulationManager : MonoBehaviour
         }
         polyGen.GeneratePolygons(gamaGeometry);
         OnGeometriesInitialized?.Invoke(gamaGeometry);
-        UpdateGameState(GameState.GAME);
+       // UpdateGameState(GameState.GAME);
         Debug.Log("SimulationManager: Geometries initialized");
     }
 

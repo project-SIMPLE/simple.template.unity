@@ -13,11 +13,18 @@ public class GAMAGeometry
     public List<string> tags;
     public List<bool> is3D;
     public List<bool> isInteractables;
+    public List<GAMAColor> colors;
 
     public static GAMAGeometry CreateFromJSON(string jsonString)
     {
         return JsonUtility.FromJson<GAMAGeometry>(jsonString);
     }
+}
+
+[System.Serializable]
+public class GAMAColor
+{
+    public List<int> c;
 }
 
 [System.Serializable]

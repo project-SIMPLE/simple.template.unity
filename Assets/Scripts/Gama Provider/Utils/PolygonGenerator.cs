@@ -11,34 +11,34 @@ public class PolygonGenerator
     XRInteractionManager interactionManager;
 
     float offsetYBackgroundGeom;
-    //private Dictionary<int, GameObject> geometriesMap3D;
-   // private Dictionary<int, GameObject> geometriesMap2D;
 
     private static PolygonGenerator instance;
 
-    public PolygonGenerator() {}
+    public PolygonGenerator() { }
 
-    public void Init(CoordinateConverter c, float Yoffset, SimulationManager simulationManager, XRInteractionManager interManager) {
+    public void Init(CoordinateConverter c, float Yoffset, SimulationManager simulationManager, XRInteractionManager interManager)
+    {
         converter = c;
         offsetYBackgroundGeom = Yoffset;
         simuManager = simulationManager;
         interactionManager = interManager;
-       // geometriesMap3D = new Dictionary<int, GameObject>();
-       //  geometriesMap2D = new Dictionary<int, GameObject>();
     }
 
-    public static PolygonGenerator GetInstance() {
-        if (instance == null) {
+    public static PolygonGenerator GetInstance()
+    {
+        if (instance == null)
+        {
             instance = new PolygonGenerator();
         }
         return instance;
     }
 
-    public static void DestroyInstance() {
+    public static void DestroyInstance()
+    {
         instance = null;
     }
 
-    
+
 
     public void GeneratePolygons(GAMAGeometry geom)
     {
@@ -47,28 +47,30 @@ public class PolygonGenerator
         GameObject generated3D = new GameObject();
         generated3D.name = "Generated 3D geometries";
 
-    
+
         List<Vector2> pts = new List<Vector2>();
         int cpt = 0;
-       // int id2D = 0;
-       // int id3D = 0;
         for (int i = 0; i < geom.points.Count; i++)
         {
             GAMAPoint pt = geom.points[i];
             if (pt.c.Count < 2)
             {
                 if (pts.Count > 2)
-                {              
+                {
                     Vector2[] MeshDataPoints = pts.ToArray();
-                    string name = geom.names.Count > 0 ?  geom.names[cpt] : "";
-                    string tag = geom.tags.Count > 0 ?  geom.tags[cpt] : "";
+                    string name = geom.names.Count > 0 ? geom.names[cpt] : "";
+                    string tag = geom.tags.Count > 0 ? geom.tags[cpt] : "";
                     float extrusionHeight = geom.heights[cpt];
                     bool isUsingCollider = geom.hasColliders[cpt];
                     bool is3D = geom.is3D[cpt];
                     bool isInteractable = geom.isInteractables[cpt];
+                    List<int> color = geom.colors[cpt].c;
+
+                    Color32 col = new Color32(BitConverter.GetBytes(color[0])[0], BitConverter.GetBytes(color[1])[0],
+                       BitConverter.GetBytes(color[2])[0], BitConverter.GetBytes(color[3])[0]);
 
                     // GameObject p = GeneratePolygon(pts.ToArray(), geom.names.Count > 0 ?  geom.names[cpt] : "", geom.tags.Count > 0 ?  geom.tags[cpt] : "", geom.heights[cpt], geom.hasColliders[cpt], geom.is3D[cpt]);
-                    GameObject p = GeneratePolygon(MeshDataPoints, name, tag, extrusionHeight, isUsingCollider, is3D);
+                    GameObject p = GeneratePolygon(MeshDataPoints, name, tag, extrusionHeight, isUsingCollider, is3D, col);
                     if (isInteractable == true)
                     {
                         XRSimpleInteractable interaction = p.AddComponent<XRSimpleInteractable>();
@@ -77,29 +79,27 @@ public class PolygonGenerator
                         if (simuManager != null)
                         {
                             interaction.selectEntered.AddListener(simuManager.SelectInteraction);
-                           
+
                             interaction.firstHoverEntered.AddListener(simuManager.HoverEnterInteraction);
                             interaction.hoverExited.AddListener(simuManager.HoverExitInteraction);
-                        } 
-                            
+                        }
 
-                       // MeshCollider col = p.GetComponent<MeshCollider>();
-                      //  col.convex = true;
                     }
-                    if (geom.is3D[cpt]) {
+                    if (geom.is3D[cpt])
+                    {
                         p.transform.SetParent(generated3D.transform);
-                   //     geometriesMap3D.Add(id3D, p);
-                       // id3D++;
-                    } else {
+                    }
+                    else
+                    {
                         p.transform.SetParent(generated2D.transform);
-                     //   geometriesMap2D.Add(id2D, p);
-                      //  id2D++;
                     }
                 }
                 pts = new List<Vector2>();
                 cpt++;
 
-            } else {
+            }
+            else
+            {
                 pts.Add(converter.fromGAMACRS2D(pt.c[0], pt.c[1]));
             }
         }
@@ -107,7 +107,8 @@ public class PolygonGenerator
 
 
     // Start is called before the first frame update
-    GameObject GeneratePolygon(Vector2[] MeshDataPoints, string name, string tag, float extrusionHeight, bool isUsingCollider, bool is3D) {
+    GameObject GeneratePolygon(Vector2[] MeshDataPoints, string name, string tag, float extrusionHeight, bool isUsingCollider, bool is3D, Color32 color)
+    {
         bool isUsingBottomMeshIn3D = false;
         bool isOutlineRendered = true;
 
@@ -115,8 +116,9 @@ public class PolygonGenerator
         GameObject polyExtruderGO = new GameObject();
         if (name != "")
             polyExtruderGO.name = name;
-        
-        if (tag != null && !string.IsNullOrEmpty( tag )) {
+
+        if (tag != null && !string.IsNullOrEmpty(tag))
+        {
             polyExtruderGO.tag = tag;
             //polyExtruderGO.layer = Layer Mask.NameToLayer(tag);
         }
@@ -132,29 +134,16 @@ public class PolygonGenerator
         Vector3 pos = polyExtruderGO.transform.position;
         pos.y += offsetYBackgroundGeom;
         polyExtruderGO.transform.position = pos;
-        polyExtruder.createPrism(polyExtruderGO.name, extrusionHeight, MeshDataPoints, Color.grey, is3D, isUsingBottomMeshIn3D, isUsingCollider);
+        polyExtruder.createPrism(polyExtruderGO.name, extrusionHeight, MeshDataPoints, color, is3D, isUsingBottomMeshIn3D, isUsingCollider);
         if (isUsingCollider)
-         {
-             MeshCollider mc = polyExtruderGO.AddComponent<MeshCollider>();
-             mc.sharedMesh = polyExtruder.surroundMesh;
-         }
+        {
+            MeshCollider mc = polyExtruderGO.AddComponent<MeshCollider>();
+            mc.sharedMesh = polyExtruder.surroundMesh;
+        }
         return polyExtruderGO;
     }
 
-   /* public Dictionary<int, GameObject> GetGeneratedGeometries3D()
-    {
-        return geometriesMap3D;
-    }
-
-    public Dictionary<int, GameObject> GetGeneratedGeometries2D()
-    {
-        return geometriesMap2D;
-    }*/
-
-    // public static void SetGeneratedBuildings(Dictionary<int, GameObject> buildings)
-    // {
-    //     buildingsMap = buildings;
-    // }
+  
 }
 
 
