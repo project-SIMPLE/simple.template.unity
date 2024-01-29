@@ -5,26 +5,30 @@ This package allows to adapt a GAMA simulation to a VR environment created with 
 ## Installation
 
 > [!WARNING]
-> The package is being developped using **Unity Editor3.5f1**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
+> The package is being developped using **Unity Editor 2022.3.5f1**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
 
 ### Prerequisites
 
 Once the project is opened in Unity, if you have any errors, you can check the following points: 
 - Make sure that **Newtonsoft Json** is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
-- To work properly, we assume that you already have a compatible GAMA model and tha you have installed the [**Gama Server Middleware**](https://github.com/project-SIMPLE/GamaServerMiddleware).
+- To work properly, we assume that you already have a compatible GAMA model and optionally that you have installed the [**Gama Server Middleware**](https://github.com/project-SIMPLE/GamaServerMiddleware) if you want to design a multi-player Game.
 
 > [!TIP]
 > **For Windows users**, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
 
 ### What is included 
 
-The project contains a basic scene with the required script and the following GameObjects:
-- Directional Light
-- XR Interaction Setup
-- Managers
-	- Menu Manager
-	- Connection Manager
-	- Game Manager
+The project contains a four scenes:
+ - Startup Menu: Main menu that allows to load two Scenes - IP Menu and Main Scene. It allows as well to define if the middleware will be used or not. Using the middleware requires to run another software (the middleware), but allows to connect several players et to follow the connection status of the players.
+ - IP Menu: allows to change the IP used to connect to the computer running the middleware/GAMA
+ - Demo/Main Scene: main scene with the required script and the following GameObjects:
+	- Directional Light
+	- FPS Player
+	- Managers
+		- Connection Manager: define the connection properties of Unity
+		- Game Manager: define all the aspects of the game
+  	- Telelport Area: used only for FPS player to move using teleportation
+    	- Debug Overlay: display all the information written in the model (using Debug.Log("message")).  
 
 ### Quick Start
 
