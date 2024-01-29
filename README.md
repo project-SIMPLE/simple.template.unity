@@ -29,7 +29,8 @@ The project contains a four scenes:
 		- Game Manager: define all the aspects of the game
   	- Telelport Area: used only for FPS player to move using teleportation
     	- Debug Overlay: display all the information written in the model (using Debug.Log("message")).  
-
+- Middleware Tester Scene: just use to test the connection to the middleware
+  
 ### Quick Start
 
 1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version (Unity Editor3.5f)**.
@@ -50,7 +51,7 @@ Then drag on drop in the `None (Object)` section the GameObject `Connection Mana
 ## Documentation
 
 This section focuses only on the C# scripts which are useful for a Unity developer. The scripts not mentioned here are at least commented.  
-**Important note:** As all the scripts which name finishes by "Manager" are instantiated when Unity is launched in the "Managers" GameObject, they are all (except MenuManager) developed using the Singleton Pattern. Hence trying to instantiate in some external scripts could break the default mechanisms. To call a method from one of these classes, one should rather use the following code snippet :
+**Important note:** As all the scripts which name finishes by "Manager" are instantiated when Unity is launched in the "Managers" GameObject, they are all developed using the Singleton Pattern. Hence trying to instantiate in some external scripts could break the default mechanisms. To call a method from one of these classes, one should rather use the following code snippet :
 
 ```csharp
 NameOfClassManager.Instance.SomeMethod();
@@ -60,10 +61,6 @@ NameOfClassManager.Instance.SomeMethod();
 
 Base abstract class to establish a web-socket connection with GAMA. All the methods of this class are private or protected. Hence they are only accessible through a child class (ConnectionManager here).  
 Theorically, in most cases, **one mustn't try to access the methods of this class**, as they are alreay used/overriden by ConnectionManager.
-
-**Serialized Fields:**    
-- `host` : ip address(/hostname) of the server
-- `port`
 
 **Abstract Methods:**  
 - `HandleConnectionOpen` : triggered when a web-socket connection is established.
@@ -116,24 +113,6 @@ This is the core script of this package. It converts raw incoming json data into
 - `void DisplayInfoText(string text)` : Allows to display a text to the user during the simulation. For instance it can be used for warning or error messages related to the connection or the game logic itself. The text is displayed in the infoText component which is accessible from the Unity editor.
 - `void RemoveInfoText` : Hides info text from the screen.
 
-## Tutorials
-
-### Displaying a UI for a given game state
-
-Let's assume that you've created a fancy startup UI that you wish to display at the launch of your app. To do that, apply the following steps:
-1. In the GameObject MenuManager (child of the GameObject Managers), expand `All Overlays` menu.  
-Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array  
-2. From the Scene hierarchy, drag and drop the GameObject corresponding to your fancy UI
-3. Expand `Associated Game States` menu.  
-Click on `+` button in the bottom right-hand corner of the menu to add a new item to the array
-4. Expand the list of game states to select the one during which you want to display your UI
-
-![t1](./ReadmeRes/t-1.png)
-
-### Calibrating the coordinate system between GAMA and Unity
-
-In theory, the coordinate systems of GAMA and Unity are already aligned. However, for some reason (issues with the 3D elements added from external sources, redefinition of some parameters in GAMA) they may not match.  
-In that case, you can apply some position and rotation transformations to the agents and change the `Coordinate conversion parameters` in the GameObject `Game Manager` (child of GameObject `Managers`).
 
 ### Hooking to a built-in event
 
