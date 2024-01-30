@@ -18,7 +18,7 @@ Once the project is opened in Unity, if you have any errors, you can check the f
 
 ### What is included 
 
-The project contains a four scenes:
+The project contains three scenes:
  - Startup Menu: Main menu that allows to load two Scenes - IP Menu and Main Scene. It allows as well to define if the middleware will be used or not. Using the middleware requires to run another software (the middleware), but allows to connect several players et to follow the connection status of the players.
  - IP Menu: allows to change the IP used to connect to the computer running the middleware/GAMA
  - Demo/Main Scene: main scene with the required script and the following GameObjects:
@@ -29,7 +29,6 @@ The project contains a four scenes:
 		- Game Manager: define all the aspects of the game
   	- Telelport Area: used only for FPS player to move using teleportation
     	- Debug Overlay: display all the information written in the model (using Debug.Log("message")).  
-- Middleware Tester Scene: just use to test the connection to the middleware
   
 ### Quick Start
 
