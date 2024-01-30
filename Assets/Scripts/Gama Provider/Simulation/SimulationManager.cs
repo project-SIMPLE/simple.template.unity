@@ -227,7 +227,7 @@ public class SimulationManager : MonoBehaviour
     private void InitGeometries() {
         if (polyGen == null) {
             polyGen = PolygonGenerator.GetInstance();
-            Debug.Log("player.GetComponentInChildren<XRInteractionManager>(): " + player.GetComponentInChildren<XRInteractionManager>());
+            //Debug.Log("player.GetComponentInChildren<XRInteractionManager>(): " + player.GetComponentInChildren<XRInteractionManager>());
             polyGen.Init(converter, offsetYBackgroundGeom, this, player.GetComponentInChildren<XRInteractionManager>());
         }
         polyGen.GeneratePolygons(gamaGeometry);

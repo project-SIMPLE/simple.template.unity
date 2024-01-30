@@ -1,51 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &365398091400080120
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6836740787462827929}
-  - component: {fileID: 8757549528368650814}
-  m_Layer: 0
-  m_Name: Menu Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6836740787462827929
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 365398091400080120}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8130529563546616615}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8757549528368650814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 365398091400080120}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad22ef930130b4b1a936d520eb6e1116, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  allOverlays: []
-  associatedGameStates: 
 --- !u!1 &1077568249799591053
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,7 +29,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6836740787462827929}
   - {fileID: 2437498117418096285}
   - {fileID: 7053002505406041103}
   m_Father: {fileID: 0}
@@ -125,12 +78,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbea15ef8fccc48ed85a2aa403cb322c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  primaryRightHandButton: {fileID: 0}
   player: {fileID: 0}
   Ground: {fileID: 0}
   Agents:
   - {fileID: 7577107419198289967, guid: 964b8008a3e9dd9419a9fd692f7f2f21, type: 3}
   - {fileID: 3137833466188651626, guid: 04fdc8229acc9ae4ba45b669007175a3, type: 3}
-  infoText: {fileID: 0}
   rotations:
   - 90
   - 90
@@ -149,8 +102,8 @@ MonoBehaviour:
   GamaCRSOffsetX: 12
   GamaCRSOffsetY: -10
   GamaCRSOffsetZ: 170
-  groundY: 0.2
   offsetYBackgroundGeom: 0.1
+  timeWithoutInteraction: 1
 --- !u!114 &8352105443706068235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,5 +165,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11357f5bde3094cf28bf436a28ed0082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  host: 127.0.0.1
-  port: 8080
