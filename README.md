@@ -33,20 +33,16 @@ The project contains a four scenes:
   
 ### Quick Start
 
-1. Once the repository is cloned, import it as a Unity project. **Make sure to use the right Editor version (Unity Editor3.5f)**.
+1. Download the silmple.template.project.
+![qs1](./ReadmeRes/download.png)
+1. Import it as a Unity project. **Make sure to use the right Editor version (Unity Editor 2022.3.5f1)**.
 ![qs1](./ReadmeRes/qs-1.png)
-1. Drag and drop in the Scene the `Managers` and `XR Interaction Setup` from the `Prefabs` folder.  
-![qs2](./ReadmeRes/qs-2.png)
-1. In the GameObject `Managers/Game Manager`, drag and drop the GameObject `XR Interaction Setup` in the `Player` field of section `Base GameObjects`.
-1. Create a 3D object in your scene (a cube for instance) and drag it into the field `Ground`  of section `Base GameObjects`.
-![qs3-4](./ReadmeRes/qs-3-4.png)
-1. Specify the IP address and the port of the middleware in the GameObject `Connection Manager`  (child of GameObject `Managers`).
-![qs5](./ReadmeRes/qs-5.png)
-1. Create in the scene an interactable component, for instance a Button. In the case of a Button, add an Item to the `OnClick` listener in the Inspector view.  
-![qs61](./ReadmeRes/qs-61.png)  
-Then drag on drop in the `None (Object)` section the GameObject `Connection Manager`. Finally, in the dropdown menu, select `ConnectionManager > TryConnectionToServer()`  
-![qs62](./ReadmeRes/qs-62.png)
-1. Launch the middleware (refer to the dedicated documentation), GAMA and **make sure all the ports are correctly setup in the middleware**. Then launch the Unity App either Unity, or in the headset after having compiled it. By clicking on the button, the client (Unity app) should appear in the middleware monitor.
+1. In the Menu "File" select "Build Settings..."
+![qs1](./ReadmeRes/Build-setting_menu.png)
+1. Select "Android" in "Platform", then click on "Switch Platform". You can after build and deploy the application on the headset by clicking on "Build and Run".
+![qs1](./ReadmeRes/Build-setting.png)
+1. To run the application in conjunction with GAMA, make sure you have installed [GAMA 1.9.3](https://github.com/gama-platform/gama/releases/tag/1.9.3) and the [Unity Plugin for GAMA](https://github.com/project-SIMPLE/gaml.extension.unity). Information on installing the plugin is available [here] (https://github.com/project-SIMPLE/gaml.extension.unity?tab=readme-ov-file#from-gama). The plugin provides a demo model (added in Plugin models/LinkToUnity/DemoModelVR.gaml) that works with the Unity project model, and in particular the main scene. To connect the VR headset to this model, run the vr_xp experiment before connecting the headset. 
+   
 
 ## Documentation
 
