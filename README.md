@@ -77,13 +77,13 @@ It is in charge of creating an ID for the player once the connection with GAMA i
 - `UpdateConnectionState(ConnectionState newState)` : Changes the current connection state to `newState`. Calling this method should be avoided whenever possible, as it could break the default connection process, leading to some undefined state.
 - `TryConnectionToServer` : Attemps a connection to the middleware or to GAMA
 - `IsConnectionState(ConnectionState currentState)` : Checks current state.
-- `SendExecutableExpression(string expression)` : Allows to send an expression to GAMA through the middleware or directlty to GAMA. The expression is compiled and executed in the experiment context. **Beware** of the arguments expected by GAMA and special characters required by GAMA (such as `;`, `"`, ...) as the expression is executed as it is sent by Unity. 
-- SendExecutableAsk(string action, Dictionary<string,string> arguments)` : Allows you to ask one of the  agents of the simulation to trigger an action (defined by its name), the second argument represents the values of the action arguments given by a dictionary (key: name of the argument, value: value of the argument). **Beware**, unlike SendExecutableExpression, the expression is not compiled, which is less time-consuming for GAMA, but only allows you to send simple values for the action's argument values and not complex expressions. 
+- `SendExecutableExpression(string expression)` : Allows to send an expression to GAMA through the middleware or directlty to GAMA. The expression is compiled and executed in the experiment context. :warning: Beware of the arguments expected by GAMA and special characters required by GAMA (such as `;`, `"`, ...) as the expression is executed as it is sent by Unity. 
+- SendExecutableAsk(string action, Dictionary<string,string> arguments)` : Allows you to ask one of the  agents of the simulation to trigger an action (defined by its name), the second argument represents the values of the action arguments given by a dictionary (key: name of the argument, value: value of the argument). :warning: unlike SendExecutableExpression, the expression is not compiled, which is less time-consuming for GAMA, but only allows you to send simple values for the action's argument values and not complex expressions. 
 - `GetConnectionId` : Returns the ID created by Unity when the connection was established.
 
 ### SimulationManager
 
-This is the core script of this package. It allows to converts raw incoming json data into a set of functions and events to which the developer can hook up, in order to trigger some actions during the simulation.
+This is the core script of this package. It allows to manage the actions triggered by the messages received by GAMA.
 
 **Events**:
 
@@ -91,7 +91,6 @@ This is the core script of this package. It allows to converts raw incoming json
 - `OnGameRestarted` : Triggered when the function `RestartGame` is called.
 - `OnGeometriesInitialized<GAMAGeometry geometries>` : Triggered when the initial geometries sent by GAMA are converted into polygons in the Unity scene. By default, `OnGameStateChanged` is triggered just after this event, to switch from the LOADING_DATA state to the GAME state. Hooking to this event allows to seperate the logic between the game state transition and the loading of geometries.  
 :warning: This event is called when incoming geometric data is successfully managed and NOT when it is received.
-- `OnWorldDataReceived<WorldJSONInfo worldData>` : Triggered each time the data of the running simulation is received and deserialized into a WorldJSONInfo object. In other word, for a regular GAMA simulation, Unity receives data from it at each (GAMA) timestep. 
 
 **Methods**:
 
@@ -99,9 +98,6 @@ This is the core script of this package. It allows to converts raw incoming json
 - `GameState GetCurrentState` : Returns the current game state
 - `bool IsGameState(GameState state)` : Compares the current game state with the one specified as a parameter.
 - `void RestartGame` : Restarts the game. Concretely, it reloads the main scene. This implementation is quite basic and can be enhanced with additional features by using the `OnGameRestarted` event.
-- `Timer GetTimer` : Give access to the Timer script provided by this package.
-- `void DisplayInfoText(string text)` : Allows to display a text to the user during the simulation. For instance it can be used for warning or error messages related to the connection or the game logic itself. The text is displayed in the infoText component which is accessible from the Unity editor.
-- `void RemoveInfoText` : Hides info text from the screen.
 
 
 ### Hooking to a built-in event
