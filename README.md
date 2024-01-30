@@ -1,17 +1,17 @@
 # GAMA VR Provider
 
-This package allows to adapt a GAMA simulation to a VR environment created with Unity. It provides the VR developer with a game and connection management system, including GameObjects, methods and events that can be hooked. A list of these elements and how to use them is provided in the [**Documentation**](#documentation) section.
+This project allows to adapt a GAMA simulation to a VR environment created with Unity. It provides the VR developer with a game and connection management system, including GameObjects, methods and events that can be hooked. A list of these elements and how to use them is provided in the [**Documentation**](#documentation) section.
 
 ## Installation
 
 > [!WARNING]
-> The package is being developped using **Unity Editor 2022.3.5f1**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
+> The project is being developped using **Unity Editor 2022.3.5f1**. Although it should work with newer versions, as is doesn't use any version-specific features (for now), it is strongly recommanded to use exactly the same Editor version.  
 
 ### Prerequisites
 
 Once the project is opened in Unity, if you have any errors, you can check the following points: 
 - Make sure that **Newtonsoft Json** is installed. Normaly, cloning this repo should ensure that it is installed. But if it's not the case, follow the tutorial on this [link](https://github.com/applejag/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM).
-- To work properly, we assume that you already have a compatible GAMA model and optionally that you have installed the [**Gama Server Middleware**](https://github.com/project-SIMPLE/GamaServerMiddleware) if you want to design a multi-player Game.
+- To work properly, we assume that you already have a compatible GAMA model and optionally that you have installed the [**Gama Server Middleware**](https://github.com/project-SIMPLE/GamaServerMiddleware) if you want to design a multi-player game.
 
 > [!TIP]
 > **For Windows users**, make sure that the folder Assets/Plugins contains a .dll file called websocket-sharp. If not, download it from [this repo](https://github.com/sta/websocket-sharp). And place it in Assets/Plugins in your Unity project. 
@@ -64,8 +64,8 @@ Theorically, in most cases, **one mustn't try to access the methods of this clas
 
 ### ConnectionManager
 
-This class extends WebSocketConnector and implements the methods mentioned above. The corresponding script is already in a GameObject called "Connection Manager", which is already in the default scene.  
-It is in charge of creating an ID for the player once the connection with GAMA is established. Moreover, it provides the Unity developer with a state machine implemented as an `enum` to handle each stage of the connection process. The specific role of each state is explined in the script source code. Some useful events allow the developer to to handle connection transitions and informations.
+This class extends WebSocketConnector and implements the methods mentioned above. The corresponding script is already in a GameObject called "Connection Manager", which is already in the Main Scene.  
+It is in charge of creating an ID for the player once the connection with GAMA is established. Moreover, it provides the Unity developer with a state machine implemented as an `enum` to handle each stage of the connection process. The specific role of each state is explained in the script source code. Some useful events allow the developer to to handle connection transitions and informations.
 
 **Events:**  
 - `OnConnectionStateChange<ConnectionState newState>` : Triggered when a transition from one connection state from another occurs.    
@@ -75,20 +75,15 @@ It is in charge of creating an ID for the player once the connection with GAMA i
 
 **Methods:**
 - `UpdateConnectionState(ConnectionState newState)` : Changes the current connection state to `newState`. Calling this method should be avoided whenever possible, as it could break the default connection process, leading to some undefined state.
-- `TryConnectionToServer` : Attemps a connection to the middleware
+- `TryConnectionToServer` : Attemps a connection to the middleware or to GAMA
 - `IsConnectionState(ConnectionState currentState)` : Checks current state.
-- `SendExecutableExpression(string expression)` : Allows to send an expression to GAMA through the middleware. **Beware** of the arguments expected by GAMA and special characters required by GAMA (such as `;`, `"`, ...) as the expression is executed as it is sent by Unity.
+- `SendExecutableExpression(string expression)` : Allows to send an expression to GAMA through the middleware or directlty to GAMA. The expression is compiled and executed in the experiment context. **Beware** of the arguments expected by GAMA and special characters required by GAMA (such as `;`, `"`, ...) as the expression is executed as it is sent by Unity. 
+- SendExecutableAsk(string action, Dictionary<string,string> arguments)` : Allows you to ask one of the  agents of the simulation to trigger an action (defined by its name), the second argument represents the values of the action arguments given by a dictionary (key: name of the argument, value: value of the argument). **Beware**, unlike SendExecutableExpression, the expression is not compiled, which is less time-consuming for GAMA, but only allows you to send simple values for the action's argument values and not complex expressions. 
 - `GetConnectionId` : Returns the ID created by Unity when the connection was established.
-
-### MenuManager
-
-As mentioned above this script is different from the other Managers as **it mustn't be instanciated at all** and it has no reason to be. It is only used to associate overlays with the GameStates during which they are displayed.  
-
-How it works is decribed in the [Tutorials section](#tutorials).
 
 ### SimulationManager
 
-This is the core script of this package. It converts raw incoming json data into a set of functions and events to which the developer can hook up, in order to trigger some actions during the simulation.
+This is the core script of this package. It allows to converts raw incoming json data into a set of functions and events to which the developer can hook up, in order to trigger some actions during the simulation.
 
 **Events**:
 
