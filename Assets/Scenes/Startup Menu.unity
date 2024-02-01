@@ -556,6 +556,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 636638373446652727, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_MaxRaycastDistance
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 864414090884945863, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
       propertyPath: m_Name
       value: FPSPlayer
@@ -599,6 +603,14 @@ PrefabInstance:
     - target: {fileID: 1932519063996068705, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3104087295058876085, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_LineLength
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3104087295058876085, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_OverrideInteractorLineLength
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
