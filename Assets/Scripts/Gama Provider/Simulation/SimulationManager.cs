@@ -66,8 +66,12 @@ public class SimulationManager : MonoBehaviour
 
     public float timeWithoutInteraction = 1.0f; //in second
     private float remainingTime = 0.0f;
-
+  
     private bool isNight = false;
+
+    private bool sendMessageToReactivatePositionSent = false;
+
+
 
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
@@ -114,6 +118,16 @@ public class SimulationManager : MonoBehaviour
     }
 
     void FixedUpdate() {
+        if (sendMessageToReactivatePositionSent)
+        {
+           
+            Dictionary<string, string> args = new Dictionary<string, string> {
+            {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") }};
+
+            ConnectionManager.Instance.SendExecutableAsk("player_position_updated", args);
+            sendMessageToReactivatePositionSent = false;
+           
+        }
         if (handlePlayerParametersRequested)
         {
             InitPlayerParameters();
@@ -138,6 +152,7 @@ public class SimulationManager : MonoBehaviour
             if (infoWorld != null)
                 UpdateAgentsList();
         }
+        
     }
 
 
@@ -268,10 +283,13 @@ public class SimulationManager : MonoBehaviour
      }
 
     private void UpdateAgentsList() {
-        if (infoWorld.position != null && infoWorld.position.Count > 1)
+        if (infoWorld.position != null && infoWorld.position.Count > 1 && sendMessageToReactivatePositionSent == false)
         {
             Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1]);
             player.transform.position = pos;
+            sendMessageToReactivatePositionSent = true;
+          
+
         }
         foreach (Dictionary<int, GameObject> agentMap in agentMapList) {
             foreach (GameObject obj in agentMap.Values) {
