@@ -6,8 +6,9 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
  
 public class SimulationManager : MonoBehaviour
-{ 
+{
     [SerializeField] private InputActionReference primaryRightHandButton;
+    [SerializeField] private InputActionReference TryReconnectButton;
 
     [Header("Base GameObjects")]
     [SerializeField] private GameObject player;
@@ -71,6 +72,9 @@ public class SimulationManager : MonoBehaviour
 
     private bool sendMessageToReactivatePositionSent = false;
 
+    private float maxTimePing = 1;
+    private float currentTimePing = 0;
+
 
 
     // ############################################ UNITY FUNCTIONS ############################################
@@ -111,11 +115,28 @@ public class SimulationManager : MonoBehaviour
     {
         if (remainingTime > 0)
             remainingTime -= Time.deltaTime;
+        if (currentTimePing > 0)
+        {
+            currentTimePing -= Time.deltaTime;
+            if (currentTimePing <= 0)
+            {
+                Debug.Log("Try to reconnect to the server");
+                ConnectionManager.Instance.Reconnect();
+            }
+        }
+          
+
         if (primaryRightHandButton != null && primaryRightHandButton.action.triggered)
         {
             TriggerMainButton();
         }
+        if (TryReconnectButton != null && TryReconnectButton.action.triggered)
+        {
+            TryReconnect();
+        }
     }
+
+
 
     void FixedUpdate() {
         if (sendMessageToReactivatePositionSent)
@@ -144,8 +165,9 @@ public class SimulationManager : MonoBehaviour
         {
             InitGeometries();
             handleGeometriesRequested = false;
-
+            AdditionalInitAfterGeomLoading(); 
         }
+        
         if (IsGameState(GameState.GAME)) {
             UpdatePlayerPosition();
 
@@ -153,6 +175,24 @@ public class SimulationManager : MonoBehaviour
                 UpdateAgentsList();
         }
         
+    }
+
+
+    void AdditionalInitAfterGeomLoading()
+    {
+        if (parameters.hotspots != null && parameters.hotspots.Count > 0) 
+        {
+            GameObject[] blocks = GameObject.FindGameObjectsWithTag("selectable");
+           
+            foreach (GameObject gameObj in blocks)
+            {
+                if (parameters.hotspots.Contains(gameObj.name))
+                {
+                    SelectedObjects.Add(gameObj);
+                    ChangeColor(gameObj, Color.red);
+                } 
+            } 
+        }
     }
 
 
@@ -242,12 +282,11 @@ public class SimulationManager : MonoBehaviour
     private void InitGeometries() {
         if (polyGen == null) {
             polyGen = PolygonGenerator.GetInstance();
-            //Debug.Log("player.GetComponentInChildren<XRInteractionManager>(): " + player.GetComponentInChildren<XRInteractionManager>());
             polyGen.Init(converter, offsetYBackgroundGeom, this, player.GetComponentInChildren<XRInteractionManager>());
         }
         polyGen.GeneratePolygons(gamaGeometry);
+        
         OnGeometriesInitialized?.Invoke(gamaGeometry);
-       // UpdateGameState(GameState.GAME);
         Debug.Log("SimulationManager: Geometries initialized");
     }
 
@@ -402,7 +441,11 @@ public class SimulationManager : MonoBehaviour
 
         if (firstKey == null)
         {
-            if (content.Contains("agents"))
+            if (content.Contains("pong"))
+            {
+                currentTimePing = 0;
+            } 
+            else if (content.Contains("agents"))
                 firstKey = "agents"; 
             else if (content.Contains("points"))
                 firstKey = "points";
@@ -461,8 +504,18 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
+    private void TryReconnect()
+    {
+        Dictionary<string, string> args = new Dictionary<string, string> {
+            {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") }};
+
+        ConnectionManager.Instance.SendExecutableAsk("ping_GAMA", args);
+
+        currentTimePing = maxTimePing;
+    }
+
     // ############################################# UTILITY FUNCTIONS ########################################
-    
+
 
     public void RestartGame() {
         OnGameRestarted?.Invoke();        
@@ -477,6 +530,8 @@ public class SimulationManager : MonoBehaviour
     public GameState GetCurrentState() {
         return currentState;
     }
+
+ 
 }
 
 

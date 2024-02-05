@@ -355,6 +355,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: TryReconnectButton
+      value: 
+      objectReference: {fileID: 6120076715984773150, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+    - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: YValues.Array.size
       value: 3
       objectReference: {fileID: 0}

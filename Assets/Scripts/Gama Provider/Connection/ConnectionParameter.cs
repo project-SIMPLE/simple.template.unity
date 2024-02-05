@@ -9,6 +9,8 @@ public class ConnectionParameter
     public List<int> position;
     public List<int> world;
 
+    public List<string> hotspots; 
+
     public static ConnectionParameter CreateFromJSON(string jsonString) {
         return JsonUtility.FromJson<ConnectionParameter>(jsonString);
     }

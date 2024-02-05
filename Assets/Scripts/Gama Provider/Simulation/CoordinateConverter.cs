@@ -61,7 +61,7 @@ public class CoordinateConverter
         position.Add((int)((pos.z - GamaCRSOffsetY) / GamaCRSCoefY * precision));
         position.Add((int)((pos.y - GamaCRSOffsetZ) / GamaCRSCoefZ * precision));
 
-        return position;
+        return position; 
     }
 
 
