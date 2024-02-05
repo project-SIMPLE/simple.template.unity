@@ -90,7 +90,7 @@ public class ConnectionManager : WebSocketConnector
             var jsonId = new Dictionary<string, string> {
                 {"type", "connection"},
                 { "id", connectionId },
-                { "set_heartbeat", "true" }
+                { "set_heartbeat", UseHeartbeat ? "true": "false" }
             }; 
             string jsonStringId = JsonConvert.SerializeObject(jsonId);
             SendMessageToServer(jsonStringId, new Action<bool>((success) => {
@@ -107,7 +107,7 @@ public class ConnectionManager : WebSocketConnector
         if (e.IsText)
         {
            
-            //Debug.Log("e.Data: " + e.Data);
+           // Debug.Log("e.Data: " + e.Data);
             JObject jsonObj = JObject.Parse(e.Data);
             string type = (string)jsonObj["type"];
            
@@ -116,6 +116,13 @@ public class ConnectionManager : WebSocketConnector
             {
                 switch (type)
                 {
+                    case "ping":
+                        var jsonId = new Dictionary<string, string> {{"type", "pong"}};
+                        string jsonStringId = JsonConvert.SerializeObject(jsonId);
+                        SendMessageToServer(jsonStringId, new Action<bool>((success) => {
+                            if (success) { }
+                        }));
+                        break;
                     case "json_state":
                         OnConnectionStateReceived?.Invoke(jsonObj);
                         bool authenticated = (bool)jsonObj["in_game"];

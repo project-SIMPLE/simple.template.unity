@@ -12,10 +12,12 @@ public abstract class WebSocketConnector : MonoBehaviour
     protected bool UseMiddleware;
 
     private WebSocket socket;
-     
-    protected bool DesktopMode = true;
-    protected bool UseMiddlewareDM = false; //only for Desktop mode
 
+    protected bool use_heartbeat = true; //only for middleware mode
+
+    protected bool DesktopMode = true;
+    protected bool UseMiddlewareDM = true; //only for Desktop mode
+  
 
 
     void OnEnable() {
