@@ -31,6 +31,7 @@ public class ConnectionManager : WebSocketConnector
     private String MessageSeparator = "|||";
 
     private String AgentToSendInfo = "simulation[0].unity_linker[0]";
+
     
     // ############################################# UNITY FUNCTIONS #############################################
     void Awake() {
@@ -107,7 +108,7 @@ public class ConnectionManager : WebSocketConnector
         if (e.IsText)
         {
            
-           // Debug.Log("e.Data: " + e.Data);
+            //Debug.Log("e.Data: " + e.Data);
             JObject jsonObj = JObject.Parse(e.Data);
             string type = (string)jsonObj["type"];
            
@@ -211,11 +212,11 @@ public class ConnectionManager : WebSocketConnector
 
             }
         } else {
-            Debug.LogWarning("ConnectionManager: Already connected to middleware");
+            Debug.LogWarning("ConnectionManager: Already connected to middleware: " + this.currentState);
         }
         
     }
-
+     
     public void DisconnectFromServer() {
         if(!IsConnectionState(ConnectionState.DISCONNECTED)) {
             Debug.Log("ConnectionManager: Disconnecting from middleware...");
@@ -240,7 +241,17 @@ public class ConnectionManager : WebSocketConnector
         string jsonStringExpression = JsonConvert.SerializeObject(jsonExpression);
         SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
             if (!success) {
+                numErrors++;
                 Debug.LogError("ConnectionManager: Failed to send executable expression");
+                if (numErrors > numErrorsBeforeDeconnection)
+                {
+                    GetSocket().Close();
+                   currentState = (ConnectionState.DISCONNECTED);
+                    numErrors = 0;
+                }
+            } else
+            {
+                numErrors = 0;
             }
         }));
     }
@@ -261,9 +272,19 @@ public class ConnectionManager : WebSocketConnector
         SendMessageToServer(jsonStringExpression, new Action<bool>((success) => {
             if (!success)
             {
-                Debug.LogError("ConnectionManager: Failed to send executable expression");
+                numErrors++;
+                Debug.LogError("ConnectionManager: Failed to send executable ask");
+                if (numErrors > numErrorsBeforeDeconnection)
+                {
+                    GetSocket().Close();
+                    currentState = (ConnectionState.DISCONNECTED);
+                    numErrors = 0;
+                }
+            } else
+            {
+                numErrors = 0;
             }
-        }));
+    }));
     }
 
     public void DisconnectProperly() {
@@ -293,8 +314,8 @@ public class ConnectionManager : WebSocketConnector
 
     public void Reconnect()
     {
-        GetSocket().Close();
-        UpdateConnectionState(ConnectionState.DISCONNECTED);
+        Debug.Log("Reconnect");
+        currentState = ConnectionState.DISCONNECTED;
         TryConnectionToServer();
     }
 

@@ -9,16 +9,17 @@ public abstract class WebSocketConnector : MonoBehaviour
      protected string host ;
      protected string port;
 
-    protected bool UseMiddleware;
+    protected bool UseMiddleware; 
 
     private WebSocket socket;
 
-    protected bool use_heartbeat = true; //only for middleware mode
+    protected bool UseHeartbeat = true; //only for middleware mode
 
-    protected bool DesktopMode = true;
+    protected bool DesktopMode = false;
     protected bool UseMiddlewareDM = true; //only for Desktop mode
-  
 
+    protected int numErrorsBeforeDeconnection = 10;
+    protected int numErrors = 0;
 
     void OnEnable() {
        
@@ -29,7 +30,7 @@ public abstract class WebSocketConnector : MonoBehaviour
         if (DesktopMode)
         {
             UseMiddleware = UseMiddlewareDM;
-            host = "localhost";
+            host = "10.0.128.39";// "localhost";
 
             if (UseMiddleware)
             {
@@ -63,7 +64,14 @@ public abstract class WebSocketConnector : MonoBehaviour
     // #######################################################################
 
     protected void SendMessageToServer(string message, Action<bool> successCallback) {
-        socket.SendAsync(message, successCallback);
+        try
+        {
+            socket.SendAsync(message, successCallback);
+        } catch (Exception e)
+        {
+
+        }
+        
     }
 
     protected WebSocket GetSocket() {

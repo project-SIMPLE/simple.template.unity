@@ -72,8 +72,8 @@ public class SimulationManager : MonoBehaviour
 
     private bool sendMessageToReactivatePositionSent = false;
 
-    private float maxTimePing = 1;
-    private float currentTimePing = 0;
+    private float maxTimePing = 1.0f;
+    private float currentTimePing = 0.0f;
 
 
 
@@ -132,6 +132,7 @@ public class SimulationManager : MonoBehaviour
         }
         if (TryReconnectButton != null && TryReconnectButton.action.triggered)
         {
+            Debug.Log("TryReconnectButton activated");
             TryReconnect();
         }
     }
@@ -512,6 +513,8 @@ public class SimulationManager : MonoBehaviour
         ConnectionManager.Instance.SendExecutableAsk("ping_GAMA", args);
 
         currentTimePing = maxTimePing;
+        Debug.Log("Sent Ping test");
+
     }
 
     // ############################################# UTILITY FUNCTIONS ########################################
