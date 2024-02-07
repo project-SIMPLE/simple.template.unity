@@ -2,6 +2,9 @@
 
 This project allows to adapt a GAMA simulation to a VR environment created with Unity. It provides the VR developer with a game and connection management system, including GameObjects, methods and events that can be hooked. A list of these elements and how to use them is provided in the [**Documentation**](#documentation) section.
 
+
+A description of the use of the template with a tutorial can be found [here](https://github.com/project-SIMPLE/documentation/wiki).
+
 ## Installation
 
 > [!WARNING]
@@ -99,62 +102,3 @@ This is the core script of this package. It allows to manage the actions trigger
 - `bool IsGameState(GameState state)` : Compares the current game state with the one specified as a parameter.
 - `void RestartGame` : Restarts the game. Concretely, it reloads the main scene. This implementation is quite basic and can be enhanced with additional features by using the `OnGameRestarted` event.
 
-
-### Hooking to a built-in event
-
-If you want to trigger an action when an event occurs (OnGameStateChanged for instance), proceed as follows:
-1. Subscribe to the event (here OnGameStateChanged) in the script in which you want to trigger the action:
-```csharp
-// #### Built-in Unity functions ####
-void OnEnable() {
-	SimulationManager.Instance.OnGameStateChanged += HandleGameStateChanged;
-}
-
-// Unsubscribing is essential to avoid memory leaks
-void OnDisable() {
-	SimulationManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
-}
-```
-
-2. Create the event handler function (i.e the function in which you define the actions to perform when the event is triggered):
-```csharp
-private void HandleGameStateChanged(GameState newState) {
-	if (newState == GameManager.GAME) {
-		// Do something
-	} else {
-		// Do something else
-	}
-}
-```
-
-> [!WARNING]
-> For some reasons that are not yet explicable, if the actions defined within the event handler function are computationaly to heavy, then the handler function is not executed. Hence we propose a trick to overcome this issue :  
-
-
-1. Create two local variables, one boolean that will act as a signal and one that will hold the new value of the parameter of the event handler when the event is fired:
-```csharp
-private GameState currentState;
-private bool actionToPerformRequested;
-
-// Built-in Unity function
-void start() {
-	currentState = SimulationManager.Instance.GetCurrentState();
-	actionToPerformRequested = false;
-}
-```
-2. Keep the same subscription mechanism as developed above.
-3. Create the event handler and define the action in the Update loop:
-```csharp
-void Update() {
-	if (actionToPerformRequested) {
-		actionToPerformRequested = false;
-		PerformAction();
-	}
-}
-
-private void HandleGameStateChanged(GameState newState) {
-	if (newState == GameManager.GAME) {
-		actionToPerformRequested = true;
-	}
-}
-```
