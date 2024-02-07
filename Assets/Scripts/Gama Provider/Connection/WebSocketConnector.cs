@@ -64,14 +64,7 @@ public abstract class WebSocketConnector : MonoBehaviour
     // #######################################################################
 
     protected void SendMessageToServer(string message, Action<bool> successCallback) {
-        try
-        {
-            socket.SendAsync(message, successCallback);
-        } catch (Exception e)
-        {
-
-        }
-        
+       socket.SendAsync(message, successCallback);
     }
 
     protected WebSocket GetSocket() {

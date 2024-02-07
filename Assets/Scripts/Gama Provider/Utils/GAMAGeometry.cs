@@ -13,6 +13,7 @@ public class GAMAGeometry
     public List<string> tags;
     public List<bool> is3D;
     public List<bool> isInteractables;
+    public List<bool> isGrabables; 
     public List<GAMAColor> colors;
 
     public static GAMAGeometry CreateFromJSON(string jsonString)

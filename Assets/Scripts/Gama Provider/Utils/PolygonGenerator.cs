@@ -64,6 +64,7 @@ public class PolygonGenerator
                     bool isUsingCollider = geom.hasColliders[cpt];
                     bool is3D = geom.is3D[cpt];
                     bool isInteractable = geom.isInteractables[cpt];
+                    bool isGrabable = geom.isGrabables[cpt];
                     List<int> color = geom.colors[cpt].c;
 
                     Color32 col = new Color32(BitConverter.GetBytes(color[0])[0], BitConverter.GetBytes(color[1])[0],
@@ -73,8 +74,15 @@ public class PolygonGenerator
                     GameObject p = GeneratePolygon(MeshDataPoints, name, tag, extrusionHeight, isUsingCollider, is3D, col);
                     if (isInteractable == true)
                     {
-                        XRSimpleInteractable interaction = p.AddComponent<XRSimpleInteractable>();
-
+                        XRBaseInteractable interaction = null;
+                        if (isGrabable)
+                        {
+                           interaction = p.AddComponent<XRGrabInteractable>();
+                        }
+                        else 
+                        {
+                            interaction = p.AddComponent<XRSimpleInteractable>();
+                        }
                         interaction.interactionManager = interactionManager;
                         if (simuManager != null)
                         {

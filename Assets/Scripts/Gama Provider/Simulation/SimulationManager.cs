@@ -44,7 +44,7 @@ public class SimulationManager : MonoBehaviour
     // called when the geometries are initialized
     public static event Action<GAMAGeometry> OnGeometriesInitialized;
     // called when the world data is received
-    public static event Action<WorldJSONInfo> OnWorldDataReceived;
+//    public static event Action<WorldJSONInfo> OnWorldDataReceived;
     // ########################################################################
 
     private List<Dictionary<int, GameObject>> agentMapList;

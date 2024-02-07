@@ -12,7 +12,7 @@ public class UnityGeometry
      
     public UnityGeometry(GameObject obj, CoordinateConverter converter)
     {
-
+         
         points = new List<UnityPoint>();
         heights = new List<int>();
         names = new List<string>();
