@@ -340,15 +340,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: GamaCRSOffsetX
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: GamaCRSOffsetY
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: GamaCRSOffsetZ
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: Agents.Array.size
@@ -425,6 +425,14 @@ PrefabInstance:
     - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: port
       value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: DesktopMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: UseMiddlewareDM
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: m_LocalPosition.x

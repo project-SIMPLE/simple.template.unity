@@ -13,12 +13,12 @@ public abstract class WebSocketConnector : MonoBehaviour
 
     private WebSocket socket;
 
-    protected bool UseHeartbeat = true; //only for middleware mode
+    public bool UseHeartbeat = true; //only for middleware mode
 
-    protected bool DesktopMode = false;
-    protected bool UseMiddlewareDM = true; //only for Desktop mode
+    public bool DesktopMode = false;
+    public bool UseMiddlewareDM = true; //only for Desktop mode
 
-    protected int numErrorsBeforeDeconnection = 10;
+    public int numErrorsBeforeDeconnection = 10;
     protected int numErrors = 0;
 
     void OnEnable() {
