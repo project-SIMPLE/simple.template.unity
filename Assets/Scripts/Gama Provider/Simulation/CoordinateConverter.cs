@@ -40,9 +40,9 @@ public class CoordinateConverter
     {
         return new Vector2((GamaCRSCoefX * x) / precision + GamaCRSOffsetX, (GamaCRSCoefY * y) / precision + GamaCRSOffsetY);
     }
-    public Vector3 fromGAMACRS(int x, int y)
+    public Vector3 fromGAMACRS(int x, int y, int z)
     {
-        return new Vector3((GamaCRSCoefX * x) / precision + GamaCRSOffsetX, +GamaCRSOffsetZ, (GamaCRSCoefY * y) / precision + GamaCRSOffsetY);
+        return new Vector3((GamaCRSCoefX * x) / precision + GamaCRSOffsetX, (GamaCRSCoefZ * z) / precision + GamaCRSOffsetZ, (GamaCRSCoefY * y) / precision + GamaCRSOffsetY);
     }
 
     public List<int> toGAMACRS(Vector3 pos)

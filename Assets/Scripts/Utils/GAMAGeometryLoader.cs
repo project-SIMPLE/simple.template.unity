@@ -14,7 +14,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
    
     private PolygonGenerator polyGen;
 
-    private GAMAGeometry geoms;
+//    private GAMAGeometry geoms;
 
     private bool continueProcess = true;
     public float GamaCRSCoefX = 1.0f;
@@ -64,14 +64,14 @@ public class GAMAGeometryLoader: ConnectionWithGama
     private void generateGeom()
     {
 
-        if (parameters != null && converter != null && geoms != null)
+        /*if (parameters != null && converter != null && geoms != null)
         {
        
             polyGen = new PolygonGenerator();
             polyGen.Init(converter, offsetYBackgroundGeom, null, null);
             polyGen.GeneratePolygons(geoms);
             continueProcess = false;
-        }
+        }*/
     }
 
     private void HandleServerMessageReceived(String content)
@@ -95,7 +95,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
 
             // handle geometries sent by GAMA at the beginning of the simulation
             case "points":
-                geoms = GAMAGeometry.CreateFromJSON(content);
+              //  geoms = GAMAGeometry.CreateFromJSON(content);
                 Debug.Log("Received geometry data");
                 break;
         }
@@ -119,7 +119,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
                         HandleServerMessageReceived(mes);
                 }
             }
-        }
+        } 
     }
 
 }

@@ -5,10 +5,13 @@ using UnityEngine;
 [System.Serializable]
 public class WorldJSONInfo
 {
-    public List<AgentInfo> agents;
-    public List<BuildingInfo> buildings;
+
     public List<int> position;
-   
+    public List<string> names;
+    public List<string> propertyID;
+    public List<GAMAPoint> pointsLoc;
+
+    public List<GAMAPoint> pointsGeom;
 
 
     public static WorldJSONInfo CreateFromJSON(string jsonString)
@@ -20,16 +23,9 @@ public class WorldJSONInfo
 
 
 [System.Serializable]
-public class AgentInfo
+public class GAMAPoint
 {
-    public List<int> v;
-
+    public List<int> c;
 }
 
-
-[System.Serializable]
-public class BuildingInfo
-{
-    public List<int> b;
-}
 

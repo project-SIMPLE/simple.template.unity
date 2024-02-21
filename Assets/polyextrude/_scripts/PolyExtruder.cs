@@ -92,7 +92,7 @@ public class PolyExtruder : MonoBehaviour
     // -> scaling is applied using the GameObject transform's localScale y-value
     private static readonly float DEFAULT_BOTTOM_Y = 0.0f;
     private static readonly float DEFAULT_TOP_Y = 1.0f;
-    private float extrusionHeightY = 1.0f;
+    private float extrusionHeightY = 1.0f; 
 
     // reference to original input vertices of Polygon in Vector2 Array format
     private Vector2[] originalPolygonVertices;
@@ -119,8 +119,7 @@ public class PolyExtruder : MonoBehaviour
     /// <param name="color">Color of the prism's material.</param>
     /// <param name="is3D">Set to<c>true</c> if polygon extrusion should be applied (= 3D prism), or <c>false</c> if it is only the (2D) polygon.</param>
     /// <param name="isUsingBottomMeshIn3D">Set to<c>true</c> if the bottom mesh component should be attached, or <c>false</c> if not.</param>
-    /// <param name="isUsingColliders">Set to<c>true</c> if MeshCollider components should be attached, or <c>false</c> if not.</param>
-    public void createPrism(string prismName, float height, Vector2[] vertices, Color32 color, bool is3D, bool isUsingBottomMeshIn3D, bool isUsingColliders)
+    public void createPrism(string prismName, float height, Vector2[] vertices, Color32 color, bool is3D, bool isUsingBottomMeshIn3D)
     {
         // set data
         this.prismName = name;
@@ -131,8 +130,6 @@ public class PolyExtruder : MonoBehaviour
         this.polygonCentroid = new Vector2(0.0f, 0.0f);
         this.is3D = is3D;
         this.isUsingBottomMeshIn3D = isUsingBottomMeshIn3D;
-        this.isUsingColliders = isUsingColliders;
-
         // handle vertex order
         bool vertexOrderClockwise = areVerticesOrderedClockwise(this.originalPolygonVertices);
         if (!vertexOrderClockwise) System.Array.Reverse(this.originalPolygonVertices);

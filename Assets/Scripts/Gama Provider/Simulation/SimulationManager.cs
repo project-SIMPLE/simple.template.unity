@@ -13,14 +13,6 @@ public class SimulationManager : MonoBehaviour
     [Header("Base GameObjects")]
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject Ground;
-    [SerializeField] private List<GameObject> Agents;
-
-    // optional: rotation, Y-translation and Size scale to apply to the prefabs correspoding to the different species of agents
-    [Header("Transformations applied to agents prefabs")]
-    [SerializeField] private List<float> rotations = new List<float> { 90.0f, 90.0f, 0.0f };
-    [SerializeField] private List<float> rotationsCoeff = new List<float> { 1, 1, 0.0f };
-    [SerializeField] private List<float> YValues = new List<float> { -0.9f, -0.9f, 0.15f };
-    [SerializeField] private List<float> Sizefactor = new List<float> { 0.3f, 0.3f, 1.0f };  
 
     // optional: define a scale between GAMA and Unity for the location given
     [Header("Coordinate conversion parameters")]
@@ -30,36 +22,36 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private float GamaCRSOffsetY = 0.0f;
 
     // Z offset and scale
-    [SerializeField] private float GamaCRSOffsetZ = 180.0f;
-    // [SerializeField] private float GamaCRSCoefZ = 1.0f;
+    [SerializeField] private float GamaCRSOffsetZ = 0.0f;
 
-    //Y-offset to apply to the background geometries
-    [SerializeField] private float offsetYBackgroundGeom = 0.0f;
+
+    XRInteractionManager interactionManager;
 
     // ################################ EVENTS ################################
     // called when the current game state changes
     public static event Action<GameState> OnGameStateChanged;
     // called when the game is restarted
     public static event Action OnGameRestarted;
-    // called when the geometries are initialized
-    public static event Action<GAMAGeometry> OnGeometriesInitialized;
+   
     // called when the world data is received
 //    public static event Action<WorldJSONInfo> OnWorldDataReceived;
     // ########################################################################
 
-    private List<Dictionary<int, GameObject>> agentMapList;
+    private Dictionary<string, List<object>> geometryMap;
+    private Dictionary<string, PropertiesGAMA> propertyMap = null;
+
     private List<GameObject> SelectedObjects;
 
     // private bool geometriesInitialized;
     private bool handleGeometriesRequested;
-    private bool handlePlayerParametersRequested;
+//    private bool handlePlayerParametersRequested;
     private bool handleGroundParametersRequested;
 
     private CoordinateConverter converter;
     private PolygonGenerator polyGen;
     private ConnectionParameter parameters;
+    private AllProperties propertiesGAMA;
     private WorldJSONInfo infoWorld;
-    private GAMAGeometry gamaGeometry;
 
     private GameState currentState;
 
@@ -105,10 +97,11 @@ public class SimulationManager : MonoBehaviour
     }
 
     void Start() {
-        InitAgentsList();
+        geometryMap = new Dictionary<string, List<object>>();
         handleGeometriesRequested = false;
-        handlePlayerParametersRequested = false;
+       // handlePlayerParametersRequested = false;
         handleGroundParametersRequested = false;
+        interactionManager = player.GetComponentInChildren<XRInteractionManager>();
     }
 
     private void Update()
@@ -137,7 +130,82 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
+    void GenerateGeometries(bool initGame)
+    {
+       
+        if (infoWorld.position != null && infoWorld.position.Count > 1 && (initGame || !sendMessageToReactivatePositionSent))
+        {
+            Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1], infoWorld.position[2]);
+            player.transform.position = pos;
 
+            sendMessageToReactivatePositionSent = true;
+        }
+        int cptPrefab = 0;
+        int cptGeom = 0;
+        for (int i = 0; i < infoWorld.names.Count; i++)
+        {
+            string name = infoWorld.names[i];
+            string propId = infoWorld.propertyID[i];
+         
+            PropertiesGAMA prop = propertyMap[propId];
+            GameObject obj = null;
+
+            if (prop.hasPrefab)
+            {
+                if (initGame || !geometryMap.ContainsKey(name))
+                {
+                    obj = instantiatePrefab(name, prop, initGame);
+                }
+                else
+                {
+                    List<object> o = geometryMap[name];
+                    PropertiesGAMA p = (PropertiesGAMA)o[1];
+                    if (p == prop)
+                    {
+                        obj = (GameObject)o[0];
+                    }
+                    else
+                    {
+                        obj.transform.position = new Vector3(0, -100, 0);
+                        GameObject.Destroy(obj);
+                        obj = instantiatePrefab(name, prop, initGame);
+                    }
+
+                }
+                List<int> pt = infoWorld.pointsLoc[cptPrefab].c;
+                Vector3 pos = converter.fromGAMACRS(pt[0], pt[1], pt[2]);
+                pos.y += pos.y + prop.yOffsetF;
+                float rot = prop.rotationCoeffF * ((0.0f + pt[3]) / parameters.precision) + prop.rotationOffsetF ;
+                obj.transform.SetPositionAndRotation(pos, Quaternion.AngleAxis(rot, Vector3.up));
+                obj.SetActive(true);
+                cptPrefab++;
+
+            }
+            else
+            {
+                if (polyGen == null)
+                { 
+                    polyGen = PolygonGenerator.GetInstance(); 
+                    polyGen.Init(converter);
+                }
+                List<int> pt = infoWorld.pointsGeom[cptGeom].c;
+                obj = polyGen.GeneratePolygons(name, pt, prop, parameters.precision);
+
+                instantiateGO(obj, name, prop, polyGen.surroundMesh);
+                polyGen.surroundMesh = null;
+
+                obj.SetActive(true);
+                cptGeom++;
+
+            }
+
+
+
+        }
+       if (initGame)
+            AdditionalInitAfterGeomLoading();
+        infoWorld = null;
+    }
 
     void FixedUpdate() {
         if (sendMessageToReactivatePositionSent)
@@ -150,28 +218,23 @@ public class SimulationManager : MonoBehaviour
             sendMessageToReactivatePositionSent = false;
            
         }
-        if (handlePlayerParametersRequested)
-        {
-            InitPlayerParameters();
-            handlePlayerParametersRequested = false;
-        }
-
         if (handleGroundParametersRequested)
         {
             InitGroundParameters();
             handleGroundParametersRequested = false;
-            UpdateGameState(GameState.GAME);
+            
         }
-        if (handleGeometriesRequested)
+        if (handleGeometriesRequested && infoWorld != null && propertyMap != null)
         {
-            InitGeometries();
+            sendMessageToReactivatePositionSent = true;
+            GenerateGeometries(true);
             handleGeometriesRequested = false;
-            AdditionalInitAfterGeomLoading(); 
+            UpdateGameState(GameState.GAME);
+
         }
         
         if (IsGameState(GameState.GAME)) {
-            UpdatePlayerPosition();
-
+             UpdatePlayerPosition();
             if (infoWorld != null)
                 UpdateAgentsList();
         }
@@ -254,13 +317,7 @@ public class SimulationManager : MonoBehaviour
     
 
     // ############################# INITIALIZERS ####################################
-    private void InitPlayerParameters() {
-        Vector3 pos = converter.fromGAMACRS(parameters.position[0], parameters.position[1]);
-        pos.y = player.transform.position.y;
-        player.transform.position = pos;
-        Debug.Log("SimulationManager: Player parameters initialized");
-    }
-
+   
 
     private void InitGroundParameters() {
         Debug.Log("GroundParameters : Beginnig ground initialization");
@@ -268,36 +325,20 @@ public class SimulationManager : MonoBehaviour
             Debug.LogError("SimulationManager: Ground not set");
             return;
         }
-        Vector3 ls = converter.fromGAMACRS(parameters.world[0], parameters.world[1]);
+        Vector3 ls = converter.fromGAMACRS(parameters.world[0], parameters.world[1], 0);
         if (ls.z < 0)
             ls.z = -ls.z;
         if (ls.x < 0)
-            ls.x = -ls.x;
+            ls.x = -ls.x; 
+        ls.y = Ground.transform.localScale.y;
         Ground.transform.localScale = ls;
-        Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2);
+        Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2, 0);
 
         Ground.transform.position = ps;
         Debug.Log("SimulationManager: Ground parameters initialized");
     }
 
-    private void InitGeometries() {
-        if (polyGen == null) {
-            polyGen = PolygonGenerator.GetInstance();
-            polyGen.Init(converter, offsetYBackgroundGeom, this, player.GetComponentInChildren<XRInteractionManager>());
-        }
-        polyGen.GeneratePolygons(gamaGeometry);
-        
-        OnGeometriesInitialized?.Invoke(gamaGeometry);
-        Debug.Log("SimulationManager: Geometries initialized");
-    }
-
-    private void InitAgentsList() {
-        agentMapList = new List<Dictionary<int, GameObject>>();
-        foreach (GameObject i in Agents) {
-            agentMapList.Add(new Dictionary<int, GameObject>());
-        }
-        Debug.Log("SimulationManager: Agents list initialized. " + Agents.Count + " species found");
-    }
+   
      
 
     // ############################################ UPDATERS ############################################
@@ -311,66 +352,84 @@ public class SimulationManager : MonoBehaviour
 
         int angle = (int) (((s > 0) ? -1.0 : 1.0) * (180 / Math.PI) * Math.Acos(c) * parameters.precision);
 
-        List<int> p = converter.toGAMACRS(Camera.main.transform.position);
+        List<int> p = converter.toGAMACRS3D(Camera.main.transform.position);
         Dictionary<string, string> args = new Dictionary<string, string> {
             {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") },
             {"x", "" +p[0]},
             {"y", "" +p[1]},
+            {"z", "" +p[2]},
             {"angle", "" +angle}
         };
 
         ConnectionManager.Instance.SendExecutableAsk("move_player_external", args);
      }
 
-    private void UpdateAgentsList() {
-        if (infoWorld.position != null && infoWorld.position.Count > 1 && sendMessageToReactivatePositionSent == false)
-        {
-            Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1]);
-            player.transform.position = pos;
-            sendMessageToReactivatePositionSent = true;
-          
+   
 
-        }
-        foreach (Dictionary<int, GameObject> agentMap in agentMapList) {
-            foreach (GameObject obj in agentMap.Values) {
-                obj.SetActive(false);
-            }
-        }
-
-        foreach (AgentInfo pi in infoWorld.agents) {
-            int speciesIndex = pi.v[0];
-            GameObject Agent = Agents[speciesIndex];
-            int id = pi.v[1];
-            GameObject obj = null;
-            Dictionary<int, GameObject> agentMap = agentMapList[speciesIndex];
-
-            if (!agentMap.ContainsKey(id)) {
-                obj = Instantiate(Agent);
-                float scale = Sizefactor[speciesIndex];
-                obj.transform.localScale = new Vector3(scale, scale, scale);
-                obj.SetActive(true);
-                agentMap.Add(id, obj);
-            } else {
-                obj = agentMap[id];
-            }
-
-
-            Vector3 pos = converter.fromGAMACRS(pi.v[2], pi.v[3]);
-            pos.y = YValues[speciesIndex];
-            float rot = rotationsCoeff[speciesIndex] * (pi.v[4] / parameters.precision) + rotations[speciesIndex];
-            obj.transform.SetPositionAndRotation(pos, Quaternion.AngleAxis(rot, Vector3.up));
-            obj.SetActive(true);
-        } 
+    private void instantiateGO(GameObject obj,  String name, PropertiesGAMA prop, Mesh mesh)
+    {
+        obj.name = name;
+        if (prop.tag != null && !string.IsNullOrEmpty(prop.tag))
+            obj.tag = prop.tag;
+    if (prop.hasCollider) {
+        MeshCollider mc = obj.AddComponent<MeshCollider>();
+        mc.sharedMesh = mesh;
         
-        foreach (Dictionary<int, GameObject> agentMap in agentMapList) {
-            List<int> ids = new List<int>(agentMap.Keys);
-            foreach (int id in ids) {
-                GameObject obj = agentMap[id];
-                if (!obj.activeSelf) {
-                    obj.transform.position = new Vector3(0, -100, 0);
-                    agentMap.Remove(id);
-                    GameObject.Destroy(obj);
-                }
+    }
+    if (prop.isInteractable){
+        XRBaseInteractable interaction = null;
+        if (prop.isGrabable)
+        {
+            interaction = obj.AddComponent<XRGrabInteractable>();
+        }
+        else {
+            interaction = obj.AddComponent<XRSimpleInteractable>();
+        }
+        interaction.interactionManager = interactionManager;
+        interaction.selectEntered.AddListener(SelectInteraction);
+        interaction.firstHoverEntered.AddListener(HoverEnterInteraction);
+        interaction.hoverExited.AddListener(HoverExitInteraction);
+          
+    }
+}
+
+    private GameObject instantiatePrefab(String name, PropertiesGAMA prop, bool initGame)
+    {
+        if (prop.prefabObj == null)
+        {
+            prop.loadPrefab(parameters.precision);
+        }
+        GameObject obj = Instantiate(prop.prefabObj);
+        Mesh mesh = obj.GetComponent<Mesh>();
+        float scale = ((float)prop.size) / parameters.precision;
+        obj.transform.localScale = new Vector3(scale, scale, scale);
+        obj.SetActive(true);
+        List<object> pL = new List<object>();
+        pL.Add(obj); pL.Add(prop);
+        if (!initGame) geometryMap.Add(name, pL);
+        instantiateGO(obj, name, prop, mesh);
+        return obj;
+    }
+
+   
+
+    private void UpdateAgentsList() {
+        
+        foreach (List<object> obj in geometryMap.Values) {
+             ((GameObject) obj[0]).SetActive(false);
+        }
+        GenerateGeometries(false);
+
+
+        List<string> ids = new List<string>(geometryMap.Keys);
+        foreach (string id in ids)
+        {
+            List<object> o = geometryMap[id];
+            GameObject obj = (GameObject)o[0];
+            if (!obj.activeSelf) {
+                obj.transform.position = new Vector3(0, -100, 0);
+                geometryMap.Remove(id);
+                GameObject.Destroy(obj);
             }
         }
         infoWorld = null;
@@ -424,7 +483,7 @@ public class SimulationManager : MonoBehaviour
                     SelectedObjects.Remove(grabbedObject);
                 ChangeColor(grabbedObject, newSelection ? Color.red : Color.gray);
 
-                remainingTime = timeWithoutInteraction;
+                remainingTime = timeWithoutInteraction; 
             }
         }
         
@@ -439,22 +498,24 @@ public class SimulationManager : MonoBehaviour
         }
     }
     private async void HandleServerMessageReceived(String firstKey, String content) {
-
+        if (content == null || content.Equals("{}")) return;
         if (firstKey == null)
         {
             if (content.Contains("pong"))
             {
                 currentTimePing = 0;
+                return;
             } 
-            else if (content.Contains("agents"))
-                firstKey = "agents"; 
-            else if (content.Contains("points"))
-                firstKey = "points";
+            else if (content.Contains("pointsLoc"))
+                firstKey = "pointsLoc"; 
             else if (content.Contains("precision"))
                 firstKey = "precision";
-           
+            else if (content.Contains("properties"))
+                firstKey = "properties";
         }
-        
+
+      //  Debug.Log("firstKey: " + firstKey);
+
         switch (firstKey) {
             // handle general informations about the simulation
             case "precision":
@@ -466,24 +527,31 @@ public class SimulationManager : MonoBehaviour
                 // Init ground and player
                 // await Task.Run(() => InitGroundParameters());
                 // await Task.Run(() => InitPlayerParameters()); 
-                handlePlayerParametersRequested = true;   
+               // handlePlayerParametersRequested = true;   
                 handleGroundParametersRequested = true;
-                
-            break; 
-
-            // handle geometries sent by GAMA at the beginning of the simulation
-            case "points":
-                gamaGeometry = GAMAGeometry.CreateFromJSON(content);
-                Debug.Log("SimulationManager: Received geometries data");
                 handleGeometriesRequested = true;
+
+
             break;
 
-            // handle agents while simulation is running
-            case "agents":
-                if (infoWorld == null) { 
-                    infoWorld = WorldJSONInfo.CreateFromJSON(content);
+            case "properties":
+                propertiesGAMA = AllProperties.CreateFromJSON(content);
+                propertyMap = new Dictionary<string, PropertiesGAMA>();
+               foreach (PropertiesGAMA p in propertiesGAMA.properties)
+                {
+                    propertyMap.Add(p.id, p);
                 }
-             break;
+                break;
+
+            // handle agents while simulation is running
+            case "pointsLoc":
+                if (infoWorld == null) {
+                    
+                    infoWorld = WorldJSONInfo.CreateFromJSON(content);
+                   
+                    //      Debug.Log("HandleServerMessageReceived infoWorld: " + infoWorld);
+                }
+                break;
 
             default:
                 Debug.LogError("SimulationManager: Received unknown message: " + content);

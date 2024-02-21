@@ -30,7 +30,7 @@ public abstract class WebSocketConnector : MonoBehaviour
         if (DesktopMode)
         {
             UseMiddleware = UseMiddlewareDM;
-            host = "10.0.128.39";// "localhost";
+            host = "localhost";
 
             if (UseMiddleware)
             {
