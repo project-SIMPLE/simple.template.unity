@@ -4,7 +4,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit; 
 using UnityEngine.InputSystem;
- 
+
+
+public static class Extensions
+{
+    public static bool TryGetComponent<T>(this GameObject obj, T result) where T : Component
+    {
+        return (result = obj.GetComponent<T>()) != null;
+    }
+}
+
 public class SimulationManager : MonoBehaviour
 {
     [SerializeField] private InputActionReference primaryRightHandButton;
@@ -42,6 +51,7 @@ public class SimulationManager : MonoBehaviour
 
     private List<GameObject> SelectedObjects;
 
+
     // private bool geometriesInitialized;
     private bool handleGeometriesRequested;
 //    private bool handlePlayerParametersRequested;
@@ -67,6 +77,7 @@ public class SimulationManager : MonoBehaviour
     private float maxTimePing = 1.0f;
     private float currentTimePing = 0.0f;
 
+    private List<GameObject> toDelete;
 
 
     // ############################################ UNITY FUNCTIONS ############################################
@@ -129,6 +140,14 @@ public class SimulationManager : MonoBehaviour
             Debug.Log("TryReconnectButton activated");
             TryReconnect();
         }
+
+        int nb = toDelete.Count;
+        for (int i = 0; i < nb; i++) {
+            toDelete[i].transform.position = new Vector3(0, -100, 0);
+            GameObject.Destroy(toDelete[i]);
+
+        }
+        toDelete.Clear();
     }
 
     void GenerateGeometries(bool initGame)
@@ -192,9 +211,15 @@ public class SimulationManager : MonoBehaviour
                 List<int> pt = infoWorld.pointsGeom[cptGeom].c;
                 obj = polyGen.GeneratePolygons(name, pt, prop, parameters.precision);
 
-                instantiateGO(obj, name, prop, polyGen.surroundMesh);
-                polyGen.surroundMesh = null;
+                if (prop.hasCollider)
+                {
 
+                    MeshCollider mc = obj.AddComponent<MeshCollider>();
+                    mc.sharedMesh = polyGen.surroundMesh;
+                }
+                instantiateGO(obj, name, prop); 
+               // polyGen.surroundMesh = null;
+                 
                 obj.SetActive(true);
                 cptGeom++;
 
@@ -367,21 +392,18 @@ public class SimulationManager : MonoBehaviour
 
    
 
-    private void instantiateGO(GameObject obj,  String name, PropertiesGAMA prop, Mesh mesh)
+    private void instantiateGO(GameObject obj,  String name, PropertiesGAMA prop)
     {
         obj.name = name;
         if (prop.tag != null && !string.IsNullOrEmpty(prop.tag))
             obj.tag = prop.tag;
-    if (prop.hasCollider) {
-        MeshCollider mc = obj.AddComponent<MeshCollider>();
-        mc.sharedMesh = mesh;
-        
-    }
-    if (prop.isInteractable){
+         
+        if (prop.isInteractable){
         XRBaseInteractable interaction = null;
         if (prop.isGrabable)
         {
             interaction = obj.AddComponent<XRGrabInteractable>();
+            obj.GetComponent<Rigidbody>().useGravity = false;
         }
         else {
             interaction = obj.AddComponent<XRSimpleInteractable>();
@@ -394,6 +416,8 @@ public class SimulationManager : MonoBehaviour
     }
 }
 
+   
+
     private GameObject instantiatePrefab(String name, PropertiesGAMA prop, bool initGame)
     {
         if (prop.prefabObj == null)
@@ -401,14 +425,31 @@ public class SimulationManager : MonoBehaviour
             prop.loadPrefab(parameters.precision);
         }
         GameObject obj = Instantiate(prop.prefabObj);
-        Mesh mesh = obj.GetComponent<Mesh>();
         float scale = ((float)prop.size) / parameters.precision;
         obj.transform.localScale = new Vector3(scale, scale, scale);
         obj.SetActive(true);
+
+        if (prop.hasCollider)
+        {
+            if (obj.TryGetComponent<LODGroup>(out var lod))
+            {
+                 foreach (LOD l in lod.GetLODs())
+                {
+                    GameObject b = l.renderers[0].gameObject;
+                    b.AddComponent<BoxCollider>();
+                    b.tag = obj.tag;
+                    b.name = obj.name;
+                }
+                   
+            } else
+            {
+                 obj.AddComponent<BoxCollider>();
+            }
+        }
         List<object> pL = new List<object>();
         pL.Add(obj); pL.Add(prop);
         if (!initGame) geometryMap.Add(name, pL);
-        instantiateGO(obj, name, prop, mesh);
+        instantiateGO(obj, name, prop);
         return obj;
     }
 
@@ -452,7 +493,7 @@ public class SimulationManager : MonoBehaviour
     {
          
         GameObject obj = ev.interactableObject.transform.gameObject;
-        if (obj.tag.Equals("selectable"))
+        if (obj.tag.Equals("selectable") || obj.tag.Equals("car") || obj.tag.Equals("moto"))
             ChangeColor(obj, Color.blue);
     }
 
@@ -465,8 +506,12 @@ public class SimulationManager : MonoBehaviour
 
             ChangeColor(obj, isSelected ? Color.red : Color.gray);
         }
+        else if (obj.tag.Equals("car") || obj.tag.Equals("moto"))
+        {
+            ChangeColor(obj, Color.white);
+        }
 
-          
+
     }
 
     public void SelectInteraction(SelectEnterEventArgs ev)
@@ -489,10 +534,22 @@ public class SimulationManager : MonoBehaviour
                     SelectedObjects.Remove(grabbedObject);
                 ChangeColor(grabbedObject, newSelection ? Color.red : Color.gray);
 
-                remainingTime = timeWithoutInteraction; 
+                remainingTime = timeWithoutInteraction;
             }
+            else if (grabbedObject.tag.Equals("car") || grabbedObject.tag.Equals("moto"))
+            {
+                Dictionary<string, string> args = new Dictionary<string, string> {
+                         {"id", grabbedObject.name }
+                    };
+                ConnectionManager.Instance.SendExecutableAsk("remove_vehicle", args);
+                toDelete.Add(grabbedObject);
+             
+
+            }
+
+
         }
-        
+
     }
      
     static public void ChangeColor(GameObject obj, Color color) 

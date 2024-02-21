@@ -99,6 +99,7 @@ Material:
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
+    - _BlendOp: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
@@ -120,6 +121,7 @@ Material:
     - _Plants1: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _SampleGI: 0
     - _Shininess: 0
     - _Smoothness: 0.5
     - _SmoothnessSource: 0
@@ -131,6 +133,7 @@ Material:
     - _Surface: 0
     - _Texture1: 1
     - _UVSec: 0
+    - _WireThickness: 100
     - _WorkflowMode: 1
     - _ZWrite: 1
     - __dirty: 0
