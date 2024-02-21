@@ -318,6 +318,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Managers
       objectReference: {fileID: 0}
+    - target: {fileID: 3011588650651213576, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6607671453211955763, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: Ground
       value: 
@@ -428,7 +432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: DesktopMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: UseMiddlewareDM
@@ -486,8 +490,7 @@ PrefabInstance:
       propertyPath: associatedGameStates.Array.size
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8352105443706068235, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 365398091400080120, guid: bf84c149438c7424e846384d10cade5b, type: 3}
     m_AddedGameObjects: []

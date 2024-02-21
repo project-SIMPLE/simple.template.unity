@@ -43,7 +43,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7053002505406041103}
   - component: {fileID: 6607671453211955763}
-  - component: {fileID: 8352105443706068235}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -79,48 +78,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   primaryRightHandButton: {fileID: 0}
+  TryReconnectButton: {fileID: 0}
   player: {fileID: 0}
   Ground: {fileID: 0}
-  Agents:
-  - {fileID: 7577107419198289967, guid: 964b8008a3e9dd9419a9fd692f7f2f21, type: 3}
-  - {fileID: 3137833466188651626, guid: 04fdc8229acc9ae4ba45b669007175a3, type: 3}
-  rotations:
-  - 90
-  - 90
-  rotationsCoeff:
-  - 1
-  - 1
-  - 0
-  YValues:
-  - -1.5
-  - -1.5
-  Sizefactor:
-  - 0.7
-  - 0.7
   GamaCRSCoefX: 0.491
   GamaCRSCoefY: -0.489
   GamaCRSOffsetX: 12
   GamaCRSOffsetY: -10
   GamaCRSOffsetZ: 170
-  offsetYBackgroundGeom: 0.1
   timeWithoutInteraction: 1
---- !u!114 &8352105443706068235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3011588650651213576}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a713d5aab3154c6f8039f6f753cbd64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timerText: {fileID: 0}
-  startColor: {r: 0, g: 201, b: 0, a: 255}
-  midColor: {r: 255, g: 218, b: 0, a: 255}
-  endColor: {r: 255, g: 0, b: 0, a: 255}
-  timerDuration: 10
 --- !u!1 &6402336256238366489
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,3 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11357f5bde3094cf28bf436a28ed0082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseHeartbeat: 1
+  DesktopMode: 0
+  UseMiddlewareDM: 1
+  numErrorsBeforeDeconnection: 10

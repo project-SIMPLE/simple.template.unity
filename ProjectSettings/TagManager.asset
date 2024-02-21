@@ -9,6 +9,9 @@ TagManager:
   - useMiddleWare
   - block
   - selectable
+  - car
+  - moto
+  - tree
   layers:
   - Default
   - TransparentFX

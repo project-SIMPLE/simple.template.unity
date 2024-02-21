@@ -106,6 +106,7 @@ public class SimulationManager : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log("num agents: " + geometryMap.Count);
         if (remainingTime > 0)
             remainingTime -= Time.deltaTime;
         if (currentTimePing > 0)
@@ -451,16 +452,21 @@ public class SimulationManager : MonoBehaviour
     {
          
         GameObject obj = ev.interactableObject.transform.gameObject;
-
-        ChangeColor(obj, Color.blue);
+        if (obj.tag.Equals("selectable"))
+            ChangeColor(obj, Color.blue);
     }
 
     public void HoverExitInteraction(HoverExitEventArgs ev)
     {
         GameObject obj = ev.interactableObject.transform.gameObject;
-        bool isSelected = SelectedObjects.Contains(obj); 
+        if (obj.tag.Equals("selectable"))
+        {
+            bool isSelected = SelectedObjects.Contains(obj);
 
-        ChangeColor(obj, isSelected ? Color.red : Color.gray);
+            ChangeColor(obj, isSelected ? Color.red : Color.gray);
+        }
+
+          
     }
 
     public void SelectInteraction(SelectEnterEventArgs ev)
