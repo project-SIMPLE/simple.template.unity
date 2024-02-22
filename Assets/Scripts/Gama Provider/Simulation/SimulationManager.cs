@@ -6,13 +6,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
 
 
-public static class Extensions
-{
-    public static bool TryGetComponent<T>(this GameObject obj, T result) where T : Component
-    {
-        return (result = obj.GetComponent<T>()) != null;
-    }
-}
 
 public class SimulationManager : MonoBehaviour
 {
@@ -33,6 +26,7 @@ public class SimulationManager : MonoBehaviour
     // Z offset and scale
     [SerializeField] private float GamaCRSOffsetZ = 0.0f;
 
+    private List<GameObject> toFollow;
 
     XRInteractionManager interactionManager;
 
@@ -84,6 +78,9 @@ public class SimulationManager : MonoBehaviour
     void Awake() {
         Instance = this;
         SelectedObjects = new List<GameObject>();
+       // toDelete = new List<GameObject>();
+
+        toFollow = new List<GameObject>();
     }
 
     void OnEnable() {
@@ -115,6 +112,46 @@ public class SimulationManager : MonoBehaviour
         interactionManager = player.GetComponentInChildren<XRInteractionManager>();
     }
 
+
+    void FixedUpdate()
+    {
+        if (sendMessageToReactivatePositionSent)
+        {
+
+            Dictionary<string, string> args = new Dictionary<string, string> {
+            {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") }};
+
+            ConnectionManager.Instance.SendExecutableAsk("player_position_updated", args);
+            sendMessageToReactivatePositionSent = false;
+
+        }
+        if (handleGroundParametersRequested)
+        {
+            InitGroundParameters();
+            handleGroundParametersRequested = false;
+
+        }
+        if (handleGeometriesRequested && infoWorld != null && propertyMap != null)
+        {
+            sendMessageToReactivatePositionSent = true;
+            GenerateGeometries(true);
+            handleGeometriesRequested = false;
+            UpdateGameState(GameState.GAME);
+
+        }
+
+        if (IsGameState(GameState.GAME))
+        {
+            UpdatePlayerPosition();
+            UpdateGameToFollowPosition();
+            if (infoWorld != null)
+                UpdateAgentsList();
+        }
+
+    }
+
+
+
     private void Update()
     {
         //Debug.Log("num agents: " + geometryMap.Count);
@@ -141,13 +178,16 @@ public class SimulationManager : MonoBehaviour
             TryReconnect();
         }
 
-        int nb = toDelete.Count;
+        /*int nb = toDelete.Count;
         for (int i = 0; i < nb; i++) {
             toDelete[i].transform.position = new Vector3(0, -100, 0);
+            if (toFollow.Contains(toDelete[i]))
+                toFollow.Remove(toDelete[i]);
+
             GameObject.Destroy(toDelete[i]);
 
         }
-        toDelete.Clear();
+        toDelete.Clear();*/
     }
 
     void GenerateGeometries(bool initGame)
@@ -187,6 +227,9 @@ public class SimulationManager : MonoBehaviour
                     else
                     {
                         obj.transform.position = new Vector3(0, -100, 0);
+                        if (toFollow.Contains(obj))
+                            toFollow.Remove(obj);
+
                         GameObject.Destroy(obj);
                         obj = instantiatePrefab(name, prop, initGame);
                     }
@@ -216,6 +259,7 @@ public class SimulationManager : MonoBehaviour
 
                     MeshCollider mc = obj.AddComponent<MeshCollider>();
                     mc.sharedMesh = polyGen.surroundMesh;
+                   // mc.isTrigger = prop.isTrigger;
                 }
                 instantiateGO(obj, name, prop); 
                // polyGen.surroundMesh = null;
@@ -232,41 +276,6 @@ public class SimulationManager : MonoBehaviour
             AdditionalInitAfterGeomLoading();
         infoWorld = null;
     }
-
-    void FixedUpdate() {
-        if (sendMessageToReactivatePositionSent)
-        {
-           
-            Dictionary<string, string> args = new Dictionary<string, string> {
-            {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") }};
-
-            ConnectionManager.Instance.SendExecutableAsk("player_position_updated", args);
-            sendMessageToReactivatePositionSent = false;
-           
-        }
-        if (handleGroundParametersRequested)
-        {
-            InitGroundParameters();
-            handleGroundParametersRequested = false;
-            
-        }
-        if (handleGeometriesRequested && infoWorld != null && propertyMap != null)
-        {
-            sendMessageToReactivatePositionSent = true;
-            GenerateGeometries(true);
-            handleGeometriesRequested = false;
-            UpdateGameState(GameState.GAME);
-
-        }
-        
-        if (IsGameState(GameState.GAME)) {
-             UpdatePlayerPosition();
-            if (infoWorld != null)
-                UpdateAgentsList();
-        }
-        
-    }
-
 
     void AdditionalInitAfterGeomLoading()
     {
@@ -364,8 +373,38 @@ public class SimulationManager : MonoBehaviour
         Debug.Log("SimulationManager: Ground parameters initialized");
     }
 
-   
-     
+
+    private void UpdateGameToFollowPosition()
+    {
+        if (toFollow.Count > 0)
+        {
+
+
+           String names = "";
+           String points = "";
+             string sep = ConnectionManager.Instance.MessageSeparator;
+       
+            foreach (GameObject obj in toFollow)
+            {
+                names += obj.name + sep;
+                List<int> p = converter.toGAMACRS3D(obj.transform.position);
+
+                points += p[0] + sep;
+
+                points += p[1] + sep;
+                points += p[2] + sep;
+
+            }
+            Dictionary<string, string> args = new Dictionary<string, string> {
+            {"ids", names  },
+            {"points", points}
+            };
+
+      ConnectionManager.Instance.SendExecutableAsk("move_geoms_followed", args);
+        
+    }
+}
+
 
     // ############################################ UPDATERS ############################################
     private void UpdatePlayerPosition() {
@@ -375,7 +414,6 @@ public class SimulationManager : MonoBehaviour
         vR.Normalize();
         float c = vF.x * vR.x + vF.y * vR.y;
         float s = vF.x * vR.y - vF.y * vR.x;
-
         int angle = (int) (((s > 0) ? -1.0 : 1.0) * (180 / Math.PI) * Math.Acos(c) * parameters.precision);
 
         List<int> p = converter.toGAMACRS3D(Camera.main.transform.position);
@@ -395,6 +433,10 @@ public class SimulationManager : MonoBehaviour
     private void instantiateGO(GameObject obj,  String name, PropertiesGAMA prop)
     {
         obj.name = name;
+        if (prop.toFollow)
+        {
+            toFollow.Add(obj);
+        }
         if (prop.tag != null && !string.IsNullOrEmpty(prop.tag))
             obj.tag = prop.tag;
          
@@ -403,10 +445,41 @@ public class SimulationManager : MonoBehaviour
         if (prop.isGrabable)
         {
             interaction = obj.AddComponent<XRGrabInteractable>();
-            obj.GetComponent<Rigidbody>().useGravity = false;
+            Rigidbody rb = obj.GetComponent<Rigidbody>();
+            if (prop.constraints != null && prop.constraints.Count == 6)
+            {
+                    if (prop.constraints[0])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezePositionX;
+                    if (prop.constraints[1])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezePositionY;
+                    if (prop.constraints[2])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezePositionZ;
+                    if (prop.constraints[3])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezeRotationX;
+                    if (prop.constraints[4])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezeRotationY;
+                    if (prop.constraints[5])
+                        rb.constraints = rb.constraints | RigidbodyConstraints.FreezeRotationZ;
+                }
+
+                
         }
         else {
+
             interaction = obj.AddComponent<XRSimpleInteractable>();
+           
+            
+        }
+       if(interaction.colliders.Count == 0)
+        {
+           Collider[] cs = obj.GetComponentsInChildren<Collider>();
+           if (cs != null)
+           {
+               foreach (Collider c in cs)
+               {
+                        interaction.colliders.Add(c);
+               }
+           }
         }
         interaction.interactionManager = interactionManager;
         interaction.selectEntered.AddListener(SelectInteraction);
@@ -436,14 +509,16 @@ public class SimulationManager : MonoBehaviour
                  foreach (LOD l in lod.GetLODs())
                 {
                     GameObject b = l.renderers[0].gameObject;
-                    b.AddComponent<BoxCollider>();
-                    b.tag = obj.tag;
-                    b.name = obj.name;
+                    BoxCollider bc = b.AddComponent<BoxCollider>();
+                   // b.tag = obj.tag;
+                   // b.name = obj.name;
+                    //bc.isTrigger = prop.isTrigger;
                 }
-                   
+                    
             } else
             {
-                 obj.AddComponent<BoxCollider>();
+                BoxCollider bc = obj.AddComponent<BoxCollider>();
+               // bc.isTrigger = prop.isTrigger;
             }
         }
         List<object> pL = new List<object>();
@@ -471,6 +546,8 @@ public class SimulationManager : MonoBehaviour
             if (!obj.activeSelf) {
                 obj.transform.position = new Vector3(0, -100, 0);
                 geometryMap.Remove(id);
+                if (toFollow.Contains(obj))
+                    toFollow.Remove(obj);
                 GameObject.Destroy(obj);
             }
         }
@@ -542,8 +619,9 @@ public class SimulationManager : MonoBehaviour
                          {"id", grabbedObject.name }
                     };
                 ConnectionManager.Instance.SendExecutableAsk("remove_vehicle", args);
-                toDelete.Add(grabbedObject);
-             
+                grabbedObject.SetActive(false);
+                //toDelete.Add(grabbedObject);
+
 
             }
 
@@ -681,4 +759,14 @@ public enum GameState {
     GAME,
     END, 
     CRASH
+}
+
+
+
+public static class Extensions
+{
+    public static bool TryGetComponent<T>(this GameObject obj, T result) where T : Component
+    {
+        return (result = obj.GetComponent<T>()) != null;
+    }
 }

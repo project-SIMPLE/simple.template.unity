@@ -28,7 +28,7 @@ public class ConnectionManager : WebSocketConnector
     public static ConnectionManager Instance = null;
 
     //use to seperate messages in the case where the middleware is not used
-    private String MessageSeparator = "|||";
+    public String MessageSeparator = "|||";
 
     private String AgentToSendInfo = "simulation[0].unity_linker[0]";
 

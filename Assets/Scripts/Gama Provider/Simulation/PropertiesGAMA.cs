@@ -19,6 +19,7 @@ public class PropertiesGAMA
     public string id;
     public bool hasCollider;
     public string tag;
+    public List<bool> constraints;
   
     public bool isInteractable;
     public bool isGrabable;
@@ -44,6 +45,7 @@ public class PropertiesGAMA
     public int blue;
     public int alpha;
 
+    public bool toFollow;
     public GameObject prefabObj = null;
 
 
