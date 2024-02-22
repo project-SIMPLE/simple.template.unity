@@ -653,6 +653,7 @@ public class SimulationManager : MonoBehaviour
                 firstKey = "precision";
             else if (content.Contains("properties"))
                 firstKey = "properties";
+
         }
 
       //  Debug.Log("firstKey: " + firstKey);
