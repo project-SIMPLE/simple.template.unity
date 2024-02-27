@@ -440,7 +440,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: UseMiddlewareDM
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: bf84c149438c7424e846384d10cade5b, type: 3}
       propertyPath: m_LocalPosition.x

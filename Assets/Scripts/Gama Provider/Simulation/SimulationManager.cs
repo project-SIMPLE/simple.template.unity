@@ -397,7 +397,8 @@ public class SimulationManager : MonoBehaviour
             }
             Dictionary<string, string> args = new Dictionary<string, string> {
             {"ids", names  },
-            {"points", points}
+            {"points", points},
+            {"sep", sep}
             };
 
       ConnectionManager.Instance.SendExecutableAsk("move_geoms_followed", args);
