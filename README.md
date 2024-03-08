@@ -36,13 +36,13 @@ The project contains three scenes:
 ### Quick Start
 
 1. Download the silmple.template.project.
-![qs1](./ReadmeRes/download.png)
+![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/download.png)
 1. Import it as a Unity project. **Make sure to use the right Editor version (Unity Editor 2022.3.5f1)**.
-![qs1](./ReadmeRes/qs-1.png)
+![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/qs-1.png)
 1. In the Menu "File" select "Build Settings..."
-![qs1](./ReadmeRes/Build-setting_menu.png)
+![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/Build-setting_menu.png)
 1. Select "Android" in "Platform", then click on "Switch Platform". You can after build and deploy the application on the headset by clicking on "Build and Run".
-![qs1](./ReadmeRes/Build-setting.png)
+![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/Build-setting.png)
 1. To run the application in conjunction with GAMA, make sure you have installed [GAMA 1.9.3](https://github.com/gama-platform/gama/releases/tag/1.9.3) and the [Unity Plugin for GAMA](https://github.com/project-SIMPLE/gaml.extension.unity). Information on installing the plugin is available [here] (https://github.com/project-SIMPLE/gaml.extension.unity?tab=readme-ov-file#from-gama). The plugin provides a demo model (added in Plugin models/LinkToUnity/DemoModelVR.gaml) that works with the Unity project model, and in particular the main scene. To connect the VR headset to this model, run the vr_xp experiment before connecting the headset. 
    
 
@@ -101,4 +101,3 @@ This is the core script of this package. It allows to manage the actions trigger
 - `GameState GetCurrentState` : Returns the current game state
 - `bool IsGameState(GameState state)` : Compares the current game state with the one specified as a parameter.
 - `void RestartGame` : Restarts the game. Concretely, it reloads the main scene. This implementation is quite basic and can be enhanced with additional features by using the `OnGameRestarted` event.
-
