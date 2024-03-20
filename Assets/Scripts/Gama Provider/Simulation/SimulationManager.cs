@@ -9,24 +9,28 @@ using UnityEngine.InputSystem;
 
 public class SimulationManager : MonoBehaviour
 {
-    [SerializeField] private InputActionReference primaryRightHandButton;
-    [SerializeField] private InputActionReference TryReconnectButton;
+    [SerializeField] protected InputActionReference primaryRightHandButton;
+    [SerializeField] protected InputActionReference TryReconnectButton;
 
-    [Header("Base GameObjects")]
-    [SerializeField] private GameObject player;
-    [SerializeField] private GameObject Ground;
+    [Header("Base GameObjects")] 
+    [SerializeField] protected GameObject player;
+    [SerializeField] protected GameObject Ground;
+
+    [SerializeField] protected GameObject HUD;
 
     // optional: define a scale between GAMA and Unity for the location given
     [Header("Coordinate conversion parameters")]
-    [SerializeField] private float GamaCRSCoefX = 1.0f;
-    [SerializeField] private float GamaCRSCoefY = 1.0f;
-    [SerializeField] private float GamaCRSOffsetX = 0.0f;
-    [SerializeField] private float GamaCRSOffsetY = 0.0f;
+    [SerializeField] protected float GamaCRSCoefX = 1.0f;
+    [SerializeField] protected float GamaCRSCoefY = 1.0f;
+    [SerializeField] protected float GamaCRSOffsetX = 0.0f;
+    [SerializeField] protected float GamaCRSOffsetY = 0.0f;
+
+
 
     // Z offset and scale
-    [SerializeField] private float GamaCRSOffsetZ = 0.0f;
+    [SerializeField] protected float GamaCRSOffsetZ = 0.0f;
 
-    private List<GameObject> toFollow;
+    protected List<GameObject> toFollow;
 
     XRInteractionManager interactionManager;
 
@@ -35,43 +39,40 @@ public class SimulationManager : MonoBehaviour
     public static event Action<GameState> OnGameStateChanged;
     // called when the game is restarted
     public static event Action OnGameRestarted;
-   
+
     // called when the world data is received
-//    public static event Action<WorldJSONInfo> OnWorldDataReceived;
+    //    public static event Action<WorldJSONInfo> OnWorldDataReceived;
     // ########################################################################
 
-    private Dictionary<string, List<object>> geometryMap;
-    private Dictionary<string, PropertiesGAMA> propertyMap = null;
+    protected Dictionary<string, List<object>> geometryMap;
+    protected Dictionary<string, PropertiesGAMA> propertyMap = null;
 
-    private List<GameObject> SelectedObjects;
+    protected List<GameObject> SelectedObjects;
 
 
-    // private bool geometriesInitialized;
-    private bool handleGeometriesRequested;
-//    private bool handlePlayerParametersRequested;
-    private bool handleGroundParametersRequested;
+    protected bool handleGeometriesRequested;
+    protected bool handleGroundParametersRequested;
 
-    private CoordinateConverter converter;
-    private PolygonGenerator polyGen;
-    private ConnectionParameter parameters;
-    private AllProperties propertiesGAMA;
-    private WorldJSONInfo infoWorld;
+    protected CoordinateConverter converter;
+    protected PolygonGenerator polyGen;
+    protected ConnectionParameter parameters;
+    protected AllProperties propertiesGAMA;
+    protected WorldJSONInfo infoWorld;
 
-    private GameState currentState;
+    protected GameState currentState;
 
     public static SimulationManager Instance = null;
 
-    public float timeWithoutInteraction = 1.0f; //in second
-    private float remainingTime = 0.0f;
-  
-    private bool isNight = false;
+    protected float timeWithoutInteraction = 1.0f; //in second
+    protected float remainingTime = 0.0f;
 
-    private bool sendMessageToReactivatePositionSent = false;
+   
+    protected bool sendMessageToReactivatePositionSent = false;
 
-    private float maxTimePing = 1.0f;
-    private float currentTimePing = 0.0f;
+    protected float maxTimePing = 1.0f;
+    protected float currentTimePing = 0.0f;
 
-    private List<GameObject> toDelete;
+    protected List<GameObject> toDelete;
 
 
     // ############################################ UNITY FUNCTIONS ############################################
@@ -295,15 +296,7 @@ public class SimulationManager : MonoBehaviour
     }
 
 
-    public void TriggerMainButton()
-    {
-        isNight = !isNight;
-        Light[] lights = FindObjectsOfType(typeof(Light)) as Light[];
-        foreach (Light light in lights)
-        {
-            light.intensity = isNight ? 0 : 1.0f;
-        }
-    }
+   
 
     // ############################################ GAMESTATE UPDATER ############################################
     public void UpdateGameState(GameState newState) {    
@@ -565,69 +558,23 @@ public class SimulationManager : MonoBehaviour
     }
 
 
-  
+    protected virtual void TriggerMainButton()
+    {
 
-    public void HoverEnterInteraction(HoverEnterEventArgs ev)
+    }
+
+    protected virtual void HoverEnterInteraction(HoverEnterEventArgs ev)
+    {
+        Debug.Log("Simulation : HoverEnterInteraction");
+    }
+
+    protected virtual void HoverExitInteraction(HoverExitEventArgs ev)
     {
          
-        GameObject obj = ev.interactableObject.transform.gameObject;
-        if (obj.tag.Equals("selectable") || obj.tag.Equals("car") || obj.tag.Equals("moto"))
-            ChangeColor(obj, Color.blue);
     }
 
-    public void HoverExitInteraction(HoverExitEventArgs ev)
+    protected virtual void SelectInteraction(SelectEnterEventArgs ev)
     {
-        GameObject obj = ev.interactableObject.transform.gameObject;
-        if (obj.tag.Equals("selectable"))
-        {
-            bool isSelected = SelectedObjects.Contains(obj);
-
-            ChangeColor(obj, isSelected ? Color.red : Color.gray);
-        }
-        else if (obj.tag.Equals("car") || obj.tag.Equals("moto"))
-        {
-            ChangeColor(obj, Color.white);
-        }
-
-
-    }
-
-    public void SelectInteraction(SelectEnterEventArgs ev)
-    {
-
-        if (remainingTime <= 0.0)
-        {
-            GameObject grabbedObject = ev.interactableObject.transform.gameObject;
-
-            if (("selectable").Equals(grabbedObject.tag))
-            {
-                Dictionary<string, string> args = new Dictionary<string, string> {
-                         {"id", grabbedObject.name }
-                    };
-                ConnectionManager.Instance.SendExecutableAsk("update_hotspot", args);
-                bool newSelection = !SelectedObjects.Contains(grabbedObject);
-                if (newSelection)
-                    SelectedObjects.Add(grabbedObject);
-                else
-                    SelectedObjects.Remove(grabbedObject);
-                ChangeColor(grabbedObject, newSelection ? Color.red : Color.gray);
-
-                remainingTime = timeWithoutInteraction;
-            }
-            else if (grabbedObject.tag.Equals("car") || grabbedObject.tag.Equals("moto"))
-            {
-                Dictionary<string, string> args = new Dictionary<string, string> {
-                         {"id", grabbedObject.name }
-                    };
-                ConnectionManager.Instance.SendExecutableAsk("remove_vehicle", args);
-                grabbedObject.SetActive(false);
-                //toDelete.Add(grabbedObject);
-
-
-            }
-
-
-        }
 
     }
      

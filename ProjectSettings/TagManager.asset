@@ -12,6 +12,7 @@ TagManager:
   - car
   - moto
   - tree
+  - token
   layers:
   - Default
   - TransparentFX
