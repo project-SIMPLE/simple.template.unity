@@ -22,6 +22,11 @@ public class SimulationManagerSolo : SimulationManager
         }
     }
 
+    protected override void ManageOtherInformation()
+    {
+
+    }
+     
 
     protected override void HoverEnterInteraction(HoverEnterEventArgs ev)
     {

@@ -329,7 +329,7 @@ GameObject:
   - component: {fileID: 1254683602}
   m_Layer: 5
   m_Name: HUD
-  m_TagString: Untagged
+  m_TagString: HUD
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -451,8 +451,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -234, y: 235}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -139.668, y: 201.251}
+  m_SizeDelta: {x: 388.664, y: 117.499}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1532386642
 MonoBehaviour:
@@ -581,7 +581,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: DesktopMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -853,7 +853,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7462567982894648384, guid: 4fccca00c0b9f4feaae590af3158112b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8015756312038755393, guid: 4fccca00c0b9f4feaae590af3158112b, type: 3}
       propertyPath: m_MatchWidthOrHeight

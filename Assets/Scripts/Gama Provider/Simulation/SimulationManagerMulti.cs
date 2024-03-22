@@ -4,14 +4,37 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit; 
 using UnityEngine.InputSystem;
+using TMPro;
 
 
 
 public class SimulationManagerMulti : SimulationManager
 {
-    private int score = 0 ;
-    private int ranking = 1;
+    protected int score = 0 ;
+    protected int ranking = 1;
+    protected int numTokens = 0;
+    private TextMeshProUGUI infoPlayerHUD;
 
+
+    protected override void ManageOtherInformation()
+    {
+        string id = ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId() : ("\"" + ConnectionManager.Instance.GetConnectionId() + "\"");
+         int index  = infoWorld.players.IndexOf(id);
+        ranking = infoWorld.ranking[index];
+        numTokens = infoWorld.numTokens;
+        updateHUD();
+
+
+    }
+
+    protected void updateHUD()
+    {
+        if (infoPlayerHUD == null)
+            infoPlayerHUD = GameObject.FindGameObjectWithTag("HUD").GetComponentInChildren<TextMeshProUGUI>();
+
+        if (infoPlayerHUD != null)
+            infoPlayerHUD.SetText("Score: " + score + " - Ranking: " + ranking +  " - Token to Find: " + numTokens);
+    }
 
     protected override void TriggerMainButton()
     {
@@ -23,14 +46,12 @@ public class SimulationManagerMulti : SimulationManager
 
         GameObject obj = ev.interactableObject.transform.gameObject;
         ChangeColor(obj, Color.blue);
-        Debug.Log("HoverEnterInteraction : " + obj);
     }
 
     protected override void HoverExitInteraction(HoverExitEventArgs ev)
     {
         GameObject obj = ev.interactableObject.transform.gameObject;
         ChangeColor(obj, Color.white);
-        Debug.Log("HoverExitInteraction : " + obj);
 
     }
 
@@ -41,14 +62,16 @@ public class SimulationManagerMulti : SimulationManager
         {
             GameObject grabbedObject = ev.interactableObject.transform.gameObject;
 
-            Debug.Log("SelectInteraction : " + grabbedObject);
+            string id = ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId() : ("\"" + ConnectionManager.Instance.GetConnectionId() + "\"");
+
             Dictionary<string, string> args = new Dictionary<string, string> {
-                         {"id", grabbedObject.name }
+                         {"id", grabbedObject.name },
+                         {"player", id }
                     };
                 ConnectionManager.Instance.SendExecutableAsk("remove_token", args);
                 grabbedObject.SetActive(false);
                 score = score + 1;
-
+                updateHUD();
                // toDelete.Add(grabbedObject);
         }
         

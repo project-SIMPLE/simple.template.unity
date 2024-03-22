@@ -16,7 +16,6 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] protected GameObject player;
     [SerializeField] protected GameObject Ground;
 
-    [SerializeField] protected GameObject HUD;
 
     // optional: define a scale between GAMA and Unity for the location given
     [Header("Coordinate conversion parameters")]
@@ -58,7 +57,7 @@ public class SimulationManager : MonoBehaviour
     protected ConnectionParameter parameters;
     protected AllProperties propertiesGAMA;
     protected WorldJSONInfo infoWorld;
-
+    
     protected GameState currentState;
 
     public static SimulationManager Instance = null;
@@ -135,7 +134,7 @@ public class SimulationManager : MonoBehaviour
         if (handleGeometriesRequested && infoWorld != null && propertyMap != null)
         {
             sendMessageToReactivatePositionSent = true;
-            GenerateGeometries(true);
+            GenerateGeometries(true, new List<string>());
             handleGeometriesRequested = false;
             UpdateGameState(GameState.GAME);
 
@@ -191,7 +190,7 @@ public class SimulationManager : MonoBehaviour
         toDelete.Clear();*/
     }
 
-    void GenerateGeometries(bool initGame)
+    void GenerateGeometries(bool initGame, List<string> toRemove)
     {
        
         if (infoWorld.position != null && infoWorld.position.Count > 1 && (initGame || !sendMessageToReactivatePositionSent))
@@ -224,9 +223,11 @@ public class SimulationManager : MonoBehaviour
                     if (p == prop)
                     {
                         obj = (GameObject)o[0];
+
                     }
                     else
                     {
+                       
                         obj.transform.position = new Vector3(0, -100, 0);
                         if (toFollow.Contains(obj))
                             toFollow.Remove(obj);
@@ -241,7 +242,8 @@ public class SimulationManager : MonoBehaviour
                 pos.y += pos.y + prop.yOffsetF;
                 float rot = prop.rotationCoeffF * ((0.0f + pt[3]) / parameters.precision) + prop.rotationOffsetF ;
                 obj.transform.SetPositionAndRotation(pos, Quaternion.AngleAxis(rot, Vector3.up));
-                obj.SetActive(true);
+                //obj.SetActive(true);
+                toRemove.Remove(name);
                 cptPrefab++;
 
             }
@@ -262,10 +264,11 @@ public class SimulationManager : MonoBehaviour
                     mc.sharedMesh = polyGen.surroundMesh;
                    // mc.isTrigger = prop.isTrigger;
                 }
-                instantiateGO(obj, name, prop); 
-               // polyGen.surroundMesh = null;
-                 
-                obj.SetActive(true);
+                instantiateGO(obj, name, prop);
+                // polyGen.surroundMesh = null;
+
+                toRemove.Remove(name);
+                //obj.SetActive(true);
                 cptGeom++;
 
             }
@@ -525,11 +528,15 @@ public class SimulationManager : MonoBehaviour
    
 
     private void UpdateAgentsList() {
-        
-        foreach (List<object> obj in geometryMap.Values) {
-             ((GameObject) obj[0]).SetActive(false);
-        }
-        GenerateGeometries(false);
+
+
+        ManageOtherInformation();
+        List<string> toRemove = new List<string>(geometryMap.Keys);
+
+       // foreach (List<object> obj in geometryMap.Values) {
+            //((GameObject) obj[0]).SetActive(false);
+        //}
+        GenerateGeometries(false, toRemove);
 
 
         List<string> ids = new List<string>(geometryMap.Keys);
@@ -545,7 +552,13 @@ public class SimulationManager : MonoBehaviour
                 GameObject.Destroy(obj);
             }
         }
+
         infoWorld = null;
+    }
+
+    protected virtual void ManageOtherInformation()
+    {
+
     }
 
     // ############################################# HANDLERS ########################################
@@ -601,6 +614,8 @@ public class SimulationManager : MonoBehaviour
                 firstKey = "precision";
             else if (content.Contains("properties"))
                 firstKey = "properties";
+            else if (content.Contains("endOfGame"))
+                firstKey = "endOfGame";
 
         }
 
@@ -635,14 +650,15 @@ public class SimulationManager : MonoBehaviour
 
             // handle agents while simulation is running
             case "pointsLoc":
-                if (infoWorld == null) {
-                    
+                if (infoWorld == null) {                    
                     infoWorld = WorldJSONInfo.CreateFromJSON(content);
-                   
-                    //      Debug.Log("HandleServerMessageReceived infoWorld: " + infoWorld);
                 }
                 break;
-
+            case "endOfGame":
+                EndOfGameInfo infoEoG = EndOfGameInfo.CreateFromJSON(content);
+                StaticInformation.endOfGame = infoEoG.endOfGame;
+                SceneManager.LoadScene("End of Game Menu");
+                break;
             default:
                 Debug.LogError("SimulationManager: Received unknown message: " + content);
                 break;

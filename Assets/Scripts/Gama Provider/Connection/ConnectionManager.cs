@@ -10,7 +10,6 @@ public class ConnectionManager : WebSocketConnector
 {
 
     private ConnectionState currentState;
-    private string connectionId;
     private bool connectionRequested; 
 
     // called when the connection state is manually changed
@@ -43,12 +42,7 @@ public class ConnectionManager : WebSocketConnector
     }
 
     void Start() {
-        if (PlayerPrefs.GetString("CONNECT_ID") != "") {
-            connectionId = PlayerPrefs.GetString("CONNECT_ID");
-        } else {
-            connectionId = Guid.NewGuid().ToString();
-            PlayerPrefs.SetString("CONNECT_ID", connectionId);
-        }
+        
         Debug.Log("START");
         UpdateConnectionState(ConnectionState.DISCONNECTED);
         connectionRequested = false;
@@ -90,7 +84,7 @@ public class ConnectionManager : WebSocketConnector
         {
             var jsonId = new Dictionary<string, string> {
                 {"type", "connection"},
-                { "id", connectionId },
+                { "id", StaticInformation.getId() },
                 { "set_heartbeat", UseHeartbeat ? "true": "false" }
             }; 
             string jsonStringId = JsonConvert.SerializeObject(jsonId);
@@ -303,7 +297,7 @@ public class ConnectionManager : WebSocketConnector
     }
 
     public string GetConnectionId() {
-        return connectionId;
+        return StaticInformation.getId();
     }
 
 

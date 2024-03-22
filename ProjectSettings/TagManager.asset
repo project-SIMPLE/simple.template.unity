@@ -13,6 +13,8 @@ TagManager:
   - moto
   - tree
   - token
+  - HUD
+  - textPN
   layers:
   - Default
   - TransparentFX

@@ -13,13 +13,16 @@ public class WorldJSONInfo
 
     public List<GAMAPoint> pointsGeom;
 
+    public List<int> ranking;
+    public List<string> players;
+    public int numTokens;
 
     public static WorldJSONInfo CreateFromJSON(string jsonString)
     {
         return JsonUtility.FromJson<WorldJSONInfo>(jsonString);
     } 
 
-}
+} 
 
 
 [System.Serializable]
