@@ -32,7 +32,7 @@ public class SimulationManagerSolo : SimulationManager
     {
 
         GameObject obj = ev.interactableObject.transform.gameObject;
-       // if (obj.tag.Equals("selectable") || obj.tag.Equals("car") || obj.tag.Equals("moto"))
+        if (obj.tag.Equals("selectable") || obj.tag.Equals("car") || obj.tag.Equals("moto"))
             ChangeColor(obj, Color.blue);
     }
 
@@ -83,7 +83,6 @@ public class SimulationManagerSolo : SimulationManager
                 ConnectionManager.Instance.SendExecutableAsk("remove_vehicle", args);
                 grabbedObject.SetActive(false);
                 //toDelete.Add(grabbedObject);
-
 
             }
 

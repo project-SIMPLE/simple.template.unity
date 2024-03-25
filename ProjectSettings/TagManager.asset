@@ -15,6 +15,7 @@ TagManager:
   - token
   - HUD
   - textPN
+  - locomotion
   layers:
   - Default
   - TransparentFX

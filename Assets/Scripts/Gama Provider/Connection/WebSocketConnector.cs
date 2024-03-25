@@ -23,7 +23,6 @@ public abstract class WebSocketConnector : MonoBehaviour
 
     void OnEnable() {
        
-        Debug.Log("WebSocketConnector OnEnable host: " + PlayerPrefs.GetString("IP") + " PORT: " + PlayerPrefs.GetString("PORT") + " MIDDLEWARE:" + PlayerPrefs.GetString("MIDDLEWARE"));
         port = PlayerPrefs.GetString("PORT"); 
         host = PlayerPrefs.GetString("IP");
 
@@ -36,13 +35,14 @@ public abstract class WebSocketConnector : MonoBehaviour
             {
                 port = "8080";
             }
-            else
+            else 
             {
                 port = "1000";
             }
             
-        }  
-      
+        }
+        Debug.Log("WebSocketConnector host: " + host + " PORT: " + port + " MIDDLEWARE:" + UseMiddleware);
+
         socket = new WebSocket("ws://" + host + ":" + port + "/");
         socket.OnOpen += HandleConnectionOpen;
         socket.OnMessage += HandleReceivedMessage;

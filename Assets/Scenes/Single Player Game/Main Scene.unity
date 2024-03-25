@@ -374,6 +374,10 @@ PrefabInstance:
       propertyPath: DesktopMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8634172197249583167, guid: bf84c149438c7424e846384d10cade5b, type: 3}
+      propertyPath: UseMiddlewareDM
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -605,7 +609,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7462567982894648384, guid: 4fccca00c0b9f4feaae590af3158112b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

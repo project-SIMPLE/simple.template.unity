@@ -21,7 +21,7 @@ public class CoordinateConverter
     {
         precision = p;
         GamaCRSCoefX = x;
-        GamaCRSCoefY = y;
+        GamaCRSCoefY = -1 * y;
         GamaCRSOffsetX = ox;
         GamaCRSOffsetY = oy;
     }
@@ -30,7 +30,7 @@ public class CoordinateConverter
     {
         precision = p;
         GamaCRSCoefX = x;
-        GamaCRSCoefY = y;
+        GamaCRSCoefY = -1 * y;
         GamaCRSCoefZ = z;
         GamaCRSOffsetX = ox;
         GamaCRSOffsetY = oy;

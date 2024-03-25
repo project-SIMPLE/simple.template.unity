@@ -251,11 +251,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4193554249683474398, guid: e0cf0d2188a1b4564821ed155d0b74f5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4193554249683474398, guid: e0cf0d2188a1b4564821ed155d0b74f5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6823023414941018510, guid: e0cf0d2188a1b4564821ed155d0b74f5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -571,6 +571,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1984075082}
+    - target: {fileID: 341288274086655003, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
+      propertyPath: GamaCRSCoefY
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1077568249799591053, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: m_Name
       value: ManagersMulti
@@ -581,7 +585,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: DesktopMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -641,6 +645,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 618805680859454696, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 864414090884945863, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
       propertyPath: m_Name
       value: FPSPlayer
@@ -684,6 +692,18 @@ PrefabInstance:
     - target: {fileID: 1932519063996068705, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2199671490519626244, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5705594574718711088, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5705594574718711088, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_TagString
+      value: locomotion
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

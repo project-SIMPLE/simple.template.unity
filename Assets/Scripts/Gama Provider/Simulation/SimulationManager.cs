@@ -73,13 +73,23 @@ public class SimulationManager : MonoBehaviour
 
     protected List<GameObject> toDelete;
 
+    protected bool readyToSendPosition = false;
+
+    protected float TimeSendPosition = 1.0f;
+    protected float TimerSendPosition = 0.0f;
+
+    protected List<GameObject> locomotion;
+
 
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
         Instance = this;
         SelectedObjects = new List<GameObject>();
-       // toDelete = new List<GameObject>();
+        // toDelete = new List<GameObject>();
 
+        locomotion = new List<GameObject>(GameObject.FindGameObjectsWithTag("locomotion"));
+
+        playerMovement(false);
         toFollow = new List<GameObject>();
     }
 
@@ -115,6 +125,7 @@ public class SimulationManager : MonoBehaviour
 
     void FixedUpdate()
     {
+       
         if (sendMessageToReactivatePositionSent)
         {
 
@@ -142,7 +153,8 @@ public class SimulationManager : MonoBehaviour
 
         if (IsGameState(GameState.GAME))
         {
-            UpdatePlayerPosition();
+            if (readyToSendPosition && TimerSendPosition <= 0.0f)
+                UpdatePlayerPosition();
             UpdateGameToFollowPosition();
             if (infoWorld != null)
                 UpdateAgentsList();
@@ -157,6 +169,10 @@ public class SimulationManager : MonoBehaviour
         //Debug.Log("num agents: " + geometryMap.Count);
         if (remainingTime > 0)
             remainingTime -= Time.deltaTime;
+        if (TimerSendPosition > 0)
+        {
+            TimerSendPosition -= Time.deltaTime;
+        }
         if (currentTimePing > 0)
         {
             currentTimePing -= Time.deltaTime;
@@ -190,15 +206,43 @@ public class SimulationManager : MonoBehaviour
         toDelete.Clear();*/
     }
 
+
+    void playerMovement(Boolean active)
+    {
+        foreach (GameObject loc in locomotion)
+        {
+            loc.active = active;
+        }
+       
+
+       /* MoveHorizontal mh = this.GetComponentInChildren<MoveHorizontal>();
+        if (mh != null)
+        {
+            mh.enabled = active;
+        }
+        MoveVertical mv = this.GetComponentInChildren<MoveVertical>();
+        if (mv != null)
+        {
+            mv.enabled = active;
+        }*/
+    }
+
+
     void GenerateGeometries(bool initGame, List<string> toRemove)
     {
        
         if (infoWorld.position != null && infoWorld.position.Count > 1 && (initGame || !sendMessageToReactivatePositionSent))
         {
             Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1], infoWorld.position[2]);
-            player.transform.position = pos;
+             player.transform.position = pos;
+            //Camera.main.transform.position = pos;
 
+            Debug.Log("player.transform.position: " + pos[0] + "," + pos[1] + "," + pos[2]);
             sendMessageToReactivatePositionSent = true;
+            readyToSendPosition = true;
+            TimerSendPosition = TimeSendPosition;
+
+            playerMovement(true);
         }
         int cptPrefab = 0;
         int cptGeom = 0;
@@ -357,14 +401,16 @@ public class SimulationManager : MonoBehaviour
             return;
         }
         Vector3 ls = converter.fromGAMACRS(parameters.world[0], parameters.world[1], 0);
+       
         if (ls.z < 0)
             ls.z = -ls.z;
         if (ls.x < 0)
             ls.x = -ls.x; 
         ls.y = Ground.transform.localScale.y;
+       
         Ground.transform.localScale = ls;
         Vector3 ps = converter.fromGAMACRS(parameters.world[0] / 2, parameters.world[1] / 2, 0);
-
+        
         Ground.transform.position = ps;
         Debug.Log("SimulationManager: Ground parameters initialized");
     }
@@ -413,7 +459,10 @@ public class SimulationManager : MonoBehaviour
         float s = vF.x * vR.y - vF.y * vR.x;
         int angle = (int) (((s > 0) ? -1.0 : 1.0) * (180 / Math.PI) * Math.Acos(c) * parameters.precision);
 
-        List<int> p = converter.toGAMACRS3D(Camera.main.transform.position);
+        //List<int> p = converter.toGAMACRS3D(player.transform.position);
+
+        Vector3 v = new Vector3(Camera.main.transform.position.x, player.transform.position.y, Camera.main.transform.position.z);
+        List<int> p = converter.toGAMACRS3D(v);
         Dictionary<string, string> args = new Dictionary<string, string> {
             {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") },
             {"x", "" +p[0]},
@@ -421,10 +470,14 @@ public class SimulationManager : MonoBehaviour
             {"z", "" +p[2]},
             {"angle", "" +angle}
         };
-
+        if (cpt < 5)
+        {
+            Debug.Log("move_player_external: " + p[0] + "," + p[1] + "," + p[2]);
+            cpt++;
+        }
         ConnectionManager.Instance.SendExecutableAsk("move_player_external", args);
      }
-
+    private int cpt = 0;
    
 
     private void instantiateGO(GameObject obj,  String name, PropertiesGAMA prop)
@@ -540,17 +593,15 @@ public class SimulationManager : MonoBehaviour
 
 
         List<string> ids = new List<string>(geometryMap.Keys);
-        foreach (string id in ids)
+        foreach (string id in toRemove)
         {
             List<object> o = geometryMap[id];
             GameObject obj = (GameObject)o[0];
-            if (!obj.activeSelf) {
-                obj.transform.position = new Vector3(0, -100, 0);
-                geometryMap.Remove(id);
-                if (toFollow.Contains(obj))
-                    toFollow.Remove(obj);
-                GameObject.Destroy(obj);
-            }
+            obj.transform.position = new Vector3(0, -100, 0);
+            geometryMap.Remove(id);
+            if (toFollow.Contains(obj))
+                toFollow.Remove(obj);
+            GameObject.Destroy(obj);
         }
 
         infoWorld = null;
