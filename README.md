@@ -31,7 +31,7 @@ The project contains five scenes:
 	- ManagersSolo
 		- Connection Manager: define the connection properties of Unity
 		- Game Manager: define all the aspects of the game
-  	- Telelport Area: used only for FPS player to move using teleportation
+  	- Teleport Area: used only for FPS player to move using teleportation
     	- Debug Overlay (not activated by default): display all the information written in the model (using Debug.Log("message")).  
   - Multi Player Game/Main Scene: main scene for the multi-player game with the required script and the following GameObjects:
 	- Directional Light
@@ -39,10 +39,10 @@ The project contains five scenes:
 	- ManagersMulti
 		- Connection Manager: define the connection properties of Unity
 		- Game Manager: define all the aspects of the game
-  	- Telelport Area: used only for FPS player to move using teleportation
-    	- HUD
+  	- Teleport Area: used only for FPS player to move using teleportation
+  	- HUD
 		- Infos for Player: display on the player screen different information (e.g. current score).
-  	- Debug Overlay (not activated by default): display all the information written in the model (using Debug.Log("message")).  
+	- Debug Overlay (not activated by default): display all the information written in the model (using Debug.Log("message")).  
 
 ### Quick Start
 
