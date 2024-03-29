@@ -21,18 +21,29 @@ Once the project is opened in Unity, if you have any errors, you can check the f
 
 ### What is included 
 
-The project contains three scenes:
+The project contains five scenes:
  - Startup Menu: Main menu that allows to load two Scenes - IP Menu and Main Scene. It allows as well to define if the middleware will be used or not. Using the middleware requires to run another software (the middleware), but allows to connect several players et to follow the connection status of the players.
  - IP Menu: allows to change the IP used to connect to the computer running the middleware/GAMA
- - Demo/Main Scene: main scene with the required script and the following GameObjects:
+ - End of Game Menu: Menu that appears at the end of a game session, displaying information for the player(s), such as scores or a summary of the game session. It can also be used to restart a new game. 
+  - Single Player Game/Main Scene: main scene for the single player game with the required script and the following GameObjects:
 	- Directional Light
 	- FPS Player
-	- Managers
+	- ManagersSolo
 		- Connection Manager: define the connection properties of Unity
 		- Game Manager: define all the aspects of the game
   	- Telelport Area: used only for FPS player to move using teleportation
-    	- Debug Overlay: display all the information written in the model (using Debug.Log("message")).  
-  
+    	- Debug Overlay (not activated by default): display all the information written in the model (using Debug.Log("message")).  
+  - Multi Player Game/Main Scene: main scene for the multi-player game with the required script and the following GameObjects:
+	- Directional Light
+	- FPS Player
+	- ManagersMulti
+		- Connection Manager: define the connection properties of Unity
+		- Game Manager: define all the aspects of the game
+  	- Telelport Area: used only for FPS player to move using teleportation
+    	- HUD
+		- Infos for Player: display on the player screen different information (e.g. current score).
+  	- Debug Overlay (not activated by default): display all the information written in the model (using Debug.Log("message")).  
+
 ### Quick Start
 
 1. Download the silmple.template.project.
