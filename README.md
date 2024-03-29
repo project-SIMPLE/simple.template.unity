@@ -54,12 +54,12 @@ The project contains five scenes:
 ![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/Build-setting_menu.png)
 1. Select "Android" in "Platform", then click on "Switch Platform". You can after build and deploy the application on the headset by clicking on "Build and Run".
 ![qs1](https://github.com/project-SIMPLE/simple.template.unity/raw/main/ReadmeRes/Build-setting.png)
-1. To run the application in conjunction with GAMA, make sure you have installed [GAMA 1.9.3](https://github.com/gama-platform/gama/releases/tag/1.9.3) and the [Unity Plugin for GAMA](https://github.com/project-SIMPLE/gaml.extension.unity). Information on installing the plugin is available [here] (https://github.com/project-SIMPLE/gaml.extension.unity?tab=readme-ov-file#from-gama). The plugin provides a demo model (added in Plugin models/LinkToUnity/DemoModelVR.gaml) that works with the Unity project model, and in particular the main scene. To connect the VR headset to this model, run the vr_xp experiment before connecting the headset. 
+1. To run the application in conjunction with GAMA, make sure you have installed [GAMA 2024/03](https://github.com/gama-platform/gama/releases/tag/2024.03.0) and the [Unity Plugin for GAMA](https://github.com/project-SIMPLE/gaml.extension.unity). Information on installing the plugin is available [here] (https://github.com/project-SIMPLE/gaml.extension.unity?tab=readme-ov-file#from-gama). The plugin provides two demo models (added in Plugin models/LinkToUnity/Single Player Game/DemoModelVR.gaml and Plugin models/LinkToUnity/Multi Player Game/RaceVR.gaml) that works with the Unity template, and in particular the two main scenes. To connect the VR headset to this model, run the vr_xp experiment before connecting the headset. 
    
 
 ## Documentation
 
-This section focuses only on the C# scripts which are useful for a Unity developer. The scripts not mentioned here are at least commented.  
+This section focuses only on the C# scripts which are useful for a Unity developer. 
 **Important note:** As all the scripts which name finishes by "Manager" are instantiated when Unity is launched in the "Managers" GameObject, they are all developed using the Singleton Pattern. Hence trying to instantiate in some external scripts could break the default mechanisms. To call a method from one of these classes, one should rather use the following code snippet :
 
 ```csharp
