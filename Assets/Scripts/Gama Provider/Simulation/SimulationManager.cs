@@ -9,8 +9,8 @@ using UnityEngine.InputSystem;
 
 public class SimulationManager : MonoBehaviour
 {
-    [SerializeField] protected InputActionReference primaryRightHandButton;
-    [SerializeField] protected InputActionReference TryReconnectButton;
+    [SerializeField] protected InputActionReference primaryRightHandButton = null;
+    [SerializeField] protected InputActionReference TryReconnectButton = null;
 
     [Header("Base GameObjects")] 
     [SerializeField] protected GameObject player;
@@ -91,13 +91,16 @@ public class SimulationManager : MonoBehaviour
 
         playerMovement(false);
         toFollow = new List<GameObject>();
+
     }
 
+    
     void OnEnable() {
         if (ConnectionManager.Instance != null) {
             ConnectionManager.Instance.OnServerMessageReceived += HandleServerMessageReceived;
             ConnectionManager.Instance.OnConnectionAttempted += HandleConnectionAttempted;
             ConnectionManager.Instance.OnConnectionStateChanged += HandleConnectionStateChanged;
+            Debug.Log("SimulationManager: OnEnable");
         } else {
             Debug.Log("No connection manager");
         }
@@ -120,6 +123,7 @@ public class SimulationManager : MonoBehaviour
        // handlePlayerParametersRequested = false;
         handleGroundParametersRequested = false;
         interactionManager = player.GetComponentInChildren<XRInteractionManager>();
+        OnEnable();
     }
 
 
@@ -166,7 +170,6 @@ public class SimulationManager : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log("num agents: " + geometryMap.Count);
         if (remainingTime > 0)
             remainingTime -= Time.deltaTime;
         if (TimerSendPosition > 0)
@@ -194,16 +197,7 @@ public class SimulationManager : MonoBehaviour
             TryReconnect();
         }
 
-        /*int nb = toDelete.Count;
-        for (int i = 0; i < nb; i++) {
-            toDelete[i].transform.position = new Vector3(0, -100, 0);
-            if (toFollow.Contains(toDelete[i]))
-                toFollow.Remove(toDelete[i]);
-
-            GameObject.Destroy(toDelete[i]);
-
-        }
-        toDelete.Clear();*/
+        OtherUpdate();
     }
 
 
@@ -237,7 +231,7 @@ public class SimulationManager : MonoBehaviour
              player.transform.position = pos;
             //Camera.main.transform.position = pos;
 
-            Debug.Log("player.transform.position: " + pos[0] + "," + pos[1] + "," + pos[2]);
+           // Debug.Log("player.transform.position: " + pos[0] + "," + pos[1] + "," + pos[2]);
             sendMessageToReactivatePositionSent = true;
             readyToSendPosition = true;
             TimerSendPosition = TimeSendPosition;
@@ -614,6 +608,7 @@ public class SimulationManager : MonoBehaviour
 
     // ############################################# HANDLERS ########################################
     private void HandleConnectionStateChanged(ConnectionState state) {
+        Debug.Log("HandleConnectionStateChanged: " + state);
         // player has been added to the simulation by the middleware
         if (state == ConnectionState.AUTHENTICATED) {
             Debug.Log("SimulationManager: Player added to simulation, waiting for initial parameters");
@@ -622,6 +617,11 @@ public class SimulationManager : MonoBehaviour
     }
 
 
+    protected virtual void OtherUpdate()
+    {
+
+    }
+
     protected virtual void TriggerMainButton()
     {
 
@@ -629,7 +629,6 @@ public class SimulationManager : MonoBehaviour
 
     protected virtual void HoverEnterInteraction(HoverEnterEventArgs ev)
     {
-        Debug.Log("Simulation : HoverEnterInteraction");
     }
 
     protected virtual void HoverExitInteraction(HoverExitEventArgs ev)
@@ -650,7 +649,14 @@ public class SimulationManager : MonoBehaviour
             renderers[i].material.color = color;// renderers[i].material.color == Color.red ? Color.gray : Color.red;
         }
     }
+
+    protected virtual void ManageOtherMessages(string content)
+    {
+
+    }
+
     private async void HandleServerMessageReceived(String firstKey, String content) {
+        
         if (content == null || content.Equals("{}")) return;
         if (firstKey == null)
         {
@@ -658,20 +664,24 @@ public class SimulationManager : MonoBehaviour
             {
                 currentTimePing = 0;
                 return;
-            } 
+            }
             else if (content.Contains("pointsLoc"))
-                firstKey = "pointsLoc"; 
+                firstKey = "pointsLoc";
             else if (content.Contains("precision"))
                 firstKey = "precision";
             else if (content.Contains("properties"))
                 firstKey = "properties";
             else if (content.Contains("endOfGame"))
                 firstKey = "endOfGame";
-
+            else
+            {
+                ManageOtherMessages(content);
+                return;
+            }
+                
         }
 
-      //  Debug.Log("firstKey: " + firstKey);
-
+       
         switch (firstKey) {
             // handle general informations about the simulation
             case "precision":
@@ -711,10 +721,10 @@ public class SimulationManager : MonoBehaviour
                 SceneManager.LoadScene("End of Game Menu");
                 break;
             default:
-                Debug.LogError("SimulationManager: Received unknown message: " + content);
+                ManageOtherMessages(content);
                 break;
         }
-
+         
     }
 
     private void HandleConnectionAttempted(bool success) {

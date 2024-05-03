@@ -11,6 +11,7 @@ public class SimulationManagerSolo : SimulationManager
 {
     protected bool isNight = false;
 
+    
 
     protected override void TriggerMainButton()
     {
@@ -26,8 +27,16 @@ public class SimulationManagerSolo : SimulationManager
     {
 
     }
-     
 
+    protected override void OtherUpdate()
+    {
+
+    }
+
+    protected override void ManageOtherMessages(string content)
+    {
+
+    }
     protected override void HoverEnterInteraction(HoverEnterEventArgs ev)
     {
 

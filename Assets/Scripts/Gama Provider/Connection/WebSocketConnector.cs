@@ -13,10 +13,13 @@ public abstract class WebSocketConnector : MonoBehaviour
 
     private WebSocket socket;
 
+    
     public bool UseHeartbeat = true; //only for middleware mode
-
     public bool DesktopMode = false;
-    public bool UseMiddlewareDM = true; //only for Desktop mode
+    public bool fixedProperties = false;
+    public string DefaultIP = "localhost";
+    public string DefaultPort = "8080";
+    public bool UseMiddlewareDM = true; 
 
     public int numErrorsBeforeDeconnection = 10;
     protected int numErrors = 0;
@@ -39,6 +42,12 @@ public abstract class WebSocketConnector : MonoBehaviour
             {
                 port = "1000";
             }
+            
+        } else if (fixedProperties)
+        {
+            UseMiddleware = UseMiddlewareDM;
+            host = DefaultIP;
+            port = DefaultPort;
             
         }
         Debug.Log("WebSocketConnector host: " + host + " PORT: " + port + " MIDDLEWARE:" + UseMiddleware);

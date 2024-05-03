@@ -41,6 +41,16 @@ public class SimulationManagerMulti : SimulationManager
  
     }
 
+    protected override void OtherUpdate()
+    {
+
+    }
+
+    protected override void ManageOtherMessages(string content)
+    {
+
+    }
+
     protected override void HoverEnterInteraction(HoverEnterEventArgs ev)
     {
 
