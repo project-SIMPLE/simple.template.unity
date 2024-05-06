@@ -16,6 +16,7 @@ public class WorldJSONInfo
     public List<int> ranking;
     public List<string> players;
     public int numTokens;
+    public bool isInit;
 
     public static WorldJSONInfo CreateFromJSON(string jsonString)
     {

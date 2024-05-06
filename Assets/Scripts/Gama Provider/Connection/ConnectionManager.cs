@@ -52,8 +52,7 @@ public class ConnectionManager : WebSocketConnector
     
     // ############################################# CONNECTION HANDLER #############################################
     public void UpdateConnectionState(ConnectionState newState) {
-        Debug.Log("ConnectionManager: Before trigger event " + currentState);
-
+        
         switch (newState) {
             case ConnectionState.PENDING:
                 Debug.Log("ConnectionManager: UpdateConnectionState -> PENDING");

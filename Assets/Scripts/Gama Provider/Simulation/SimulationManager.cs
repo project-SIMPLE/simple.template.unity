@@ -6,7 +6,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
 
 
-
 public class SimulationManager : MonoBehaviour
 {
     [SerializeField] protected InputActionReference primaryRightHandButton = null;
@@ -81,6 +80,8 @@ public class SimulationManager : MonoBehaviour
     protected List<GameObject> locomotion;
 
 
+
+
     // ############################################ UNITY FUNCTIONS ############################################
     void Awake() {
         Instance = this;
@@ -146,8 +147,9 @@ public class SimulationManager : MonoBehaviour
             handleGroundParametersRequested = false;
 
         }
-        if (handleGeometriesRequested && infoWorld != null && propertyMap != null)
+        if (handleGeometriesRequested && infoWorld != null && infoWorld.isInit && propertyMap != null)
         {
+           
             sendMessageToReactivatePositionSent = true;
             GenerateGeometries(true, new List<string>());
             handleGeometriesRequested = false;
@@ -160,7 +162,7 @@ public class SimulationManager : MonoBehaviour
             if (readyToSendPosition && TimerSendPosition <= 0.0f)
                 UpdatePlayerPosition();
             UpdateGameToFollowPosition();
-            if (infoWorld != null)
+            if (infoWorld != null && !infoWorld.isInit)
                 UpdateAgentsList();
         }
 
@@ -224,7 +226,7 @@ public class SimulationManager : MonoBehaviour
 
     void GenerateGeometries(bool initGame, List<string> toRemove)
     {
-       
+
         if (infoWorld.position != null && infoWorld.position.Count > 1 && (initGame || !sendMessageToReactivatePositionSent))
         {
             Vector3 pos = converter.fromGAMACRS(infoWorld.position[0], infoWorld.position[1], infoWorld.position[2]);
@@ -257,10 +259,12 @@ public class SimulationManager : MonoBehaviour
                 else
                 {
                     List<object> o = geometryMap[name];
+                   
                     PropertiesGAMA p = (PropertiesGAMA)o[1];
                     if (p == prop)
                     {
                         obj = (GameObject)o[0];
+
 
                     }
                     else
@@ -287,13 +291,14 @@ public class SimulationManager : MonoBehaviour
             }
             else
             {
-                if (polyGen == null)
+                if (polyGen == null) 
                 { 
                     polyGen = PolygonGenerator.GetInstance(); 
                     polyGen.Init(converter);
                 }
                 List<int> pt = infoWorld.pointsGeom[cptGeom].c;
-                obj = polyGen.GeneratePolygons(name, pt, prop, parameters.precision);
+
+                obj = polyGen.GeneratePolygons(name , pt, prop, parameters.precision);
 
                 if (prop.hasCollider)
                 {
@@ -302,10 +307,28 @@ public class SimulationManager : MonoBehaviour
                     mc.sharedMesh = polyGen.surroundMesh;
                    // mc.isTrigger = prop.isTrigger;
                 }
+
                 instantiateGO(obj, name, prop);
                 // polyGen.surroundMesh = null;
+                
+                if (geometryMap.ContainsKey(name)) {
 
-                toRemove.Remove(name);
+                    GameObject objOld = (GameObject)geometryMap[name][0];
+                    objOld.transform.position = new Vector3(0, -100, 0);
+                    geometryMap.Remove(name);
+                    if (toFollow.Contains(objOld))
+                        toFollow.Remove(objOld);
+                    GameObject.Destroy(objOld);
+                }
+                List<object> pL = new List<object>();
+                pL.Add(obj); pL.Add(prop);
+               // toRemoveAfter.Add(name);
+
+                if (!initGame)
+                {
+                    geometryMap.Add(name, pL);
+                }
+
                 //obj.SetActive(true);
                 cptGeom++;
 
@@ -580,13 +603,14 @@ public class SimulationManager : MonoBehaviour
         ManageOtherInformation();
         List<string> toRemove = new List<string>(geometryMap.Keys);
 
-       // foreach (List<object> obj in geometryMap.Values) {
-            //((GameObject) obj[0]).SetActive(false);
+        // foreach (List<object> obj in geometryMap.Values) {
+        //((GameObject) obj[0]).SetActive(false);
         //}
+       // toRemove.addAll(toRemoveAfter.k);
         GenerateGeometries(false, toRemove);
 
 
-        List<string> ids = new List<string>(geometryMap.Keys);
+       // List<string> ids = new List<string>(geometryMap.Keys);
         foreach (string id in toRemove)
         {
             List<object> o = geometryMap[id];
@@ -597,6 +621,7 @@ public class SimulationManager : MonoBehaviour
                 toFollow.Remove(obj);
             GameObject.Destroy(obj);
         }
+        
 
         infoWorld = null;
     }
