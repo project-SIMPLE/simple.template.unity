@@ -304,6 +304,10 @@ public class SimulationManager : MonoBehaviour
                 {
 
                     MeshCollider mc = obj.AddComponent<MeshCollider>();
+                    if (prop.isGrabable)
+                    {
+                        mc.convex = true;
+                    }
                     mc.sharedMesh = polyGen.surroundMesh;
                    // mc.isTrigger = prop.isTrigger;
                 }
