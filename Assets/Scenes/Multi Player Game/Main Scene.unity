@@ -585,7 +585,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6696467980461973084, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: DesktopMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8130529563546616615, guid: 894cbc7e0986f4aa2bc1fee171cdb09b, type: 3}
       propertyPath: m_LocalPosition.x
