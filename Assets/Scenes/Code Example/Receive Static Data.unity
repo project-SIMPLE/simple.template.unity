@@ -363,7 +363,19 @@ PrefabInstance:
       value: Connection Manager
       objectReference: {fileID: 0}
     - target: {fileID: 8400268368628786363, guid: 183635f754b18454b8f0d5a78d41ad7d, type: 3}
+      propertyPath: DefaultIP
+      value: 10.0.7.175
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400268368628786363, guid: 183635f754b18454b8f0d5a78d41ad7d, type: 3}
+      propertyPath: DesktopMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400268368628786363, guid: 183635f754b18454b8f0d5a78d41ad7d, type: 3}
       propertyPath: UseMiddlewareDM
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400268368628786363, guid: 183635f754b18454b8f0d5a78d41ad7d, type: 3}
+      propertyPath: fixedProperties
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -561,6 +573,10 @@ PrefabInstance:
     - target: {fileID: 1932519063996068705, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5705594574718711088, guid: 2c59fa02513994303ad959d140b545eb, type: 3}
+      propertyPath: m_TagString
+      value: locomotion
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

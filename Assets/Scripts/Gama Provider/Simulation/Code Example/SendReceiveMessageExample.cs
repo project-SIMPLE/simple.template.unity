@@ -13,6 +13,7 @@ public class SendReceiveMessageExample : SimulationManager
  {
      GAMAMessage message = GAMAMessage.CreateFromJSON(content);
      Debug.Log("received from GAMA: cycle " + message.cycle);
+     message = null;
  }
 
 //action activated at the end of the update phase (every frame)
@@ -21,13 +22,13 @@ public class SendReceiveMessageExample : SimulationManager
 
      if (IsGameState(GameState.GAME) && UnityEngine.Random.Range(0.0f, 1.0f) < 0.002f )
      {
-
+            string mes = "A message from Unity at time: " + Time.time;
           //call the action "receive_message" from the unity_linker agent with two arguments: the id of the player and a message
          Dictionary<string, string> args = new Dictionary<string, string> {
          {"id",ConnectionManager.Instance.getUseMiddleware() ? ConnectionManager.Instance.GetConnectionId()  : ("\"" + ConnectionManager.Instance.GetConnectionId() +  "\"") },
-         {"mes",  "A message from Unity at time: " + Time.time }};
+         {"mes",  mes }};
 
-
+            Debug.Log("sent to GAMA: " + mes);
          ConnectionManager.Instance.SendExecutableAsk("receive_message", args);
      }
 

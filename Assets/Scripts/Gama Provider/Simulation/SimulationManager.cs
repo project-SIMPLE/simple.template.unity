@@ -93,6 +93,7 @@ public class SimulationManager : MonoBehaviour
         playerMovement(false);
         toFollow = new List<GameObject>();
 
+
     }
 
     
@@ -315,10 +316,10 @@ public class SimulationManager : MonoBehaviour
                 instantiateGO(obj, name, prop);
                 // polyGen.surroundMesh = null;
                 
-                if (geometryMap.ContainsKey(name)) {
+               if (geometryMap.ContainsKey(name)) {
 
                     GameObject objOld = (GameObject)geometryMap[name][0];
-                    objOld.transform.position = new Vector3(0, -100, 0);
+                   // objOld.transform.position = new Vector3(0, -100, 0);
                     geometryMap.Remove(name);
                     if (toFollow.Contains(objOld))
                         toFollow.Remove(objOld);
@@ -326,10 +327,11 @@ public class SimulationManager : MonoBehaviour
                 }
                 List<object> pL = new List<object>();
                 pL.Add(obj); pL.Add(prop);
-               // toRemoveAfter.Add(name);
+                toRemove.Remove(name);
 
                 if (!initGame)
                 {
+
                     geometryMap.Add(name, pL);
                 }
 
@@ -606,11 +608,11 @@ public class SimulationManager : MonoBehaviour
 
         ManageOtherInformation();
         List<string> toRemove = new List<string>(geometryMap.Keys);
-
+      
         // foreach (List<object> obj in geometryMap.Values) {
         //((GameObject) obj[0]).SetActive(false);
         //}
-       // toRemove.addAll(toRemoveAfter.k);
+        // toRemove.addAll(toRemoveAfter.k);
         GenerateGeometries(false, toRemove);
 
 
