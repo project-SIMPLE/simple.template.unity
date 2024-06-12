@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEngine.XR.Interaction.Toolkit;
 
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Linq;
 
@@ -191,6 +190,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
     void GenerateGeometries()
     {
         Debug.Log("GenerateGeometries");
+        Dictionary<PropertiesGAMA, List<GameObject>> mapObjects = new Dictionary<PropertiesGAMA, List<GameObject>>();
        int cptPrefab = 0;
         int cptGeom = 0;
         for (int i = 0; i < infoWorld.names.Count; i++)
@@ -221,12 +221,10 @@ public class GAMAGeometryLoader: ConnectionWithGama
                 {
                     polyGen = PolygonGenerator.GetInstance();
                     polyGen.Init(converter);
-                    Debug.Log("init PolygonGenerator: " + polyGen);
                 }
                 List<int> pt = infoWorld.pointsGeom[cptGeom].c;
 
                 obj = polyGen.GeneratePolygons(name, pt, prop, parameters.precision);
-                Debug.Log("obj: " + obj);
                 if (prop.hasCollider)
                 {
 
@@ -249,9 +247,25 @@ public class GAMAGeometryLoader: ConnectionWithGama
                 cptGeom++;
 
             }
+            if (obj != null)
+            {
+                if (!mapObjects.ContainsKey(prop))
+                    mapObjects[prop] = new List<GameObject>();
+                mapObjects[prop].Add(obj);
+            }
 
 
+        }
+        GameObject n = new GameObject("GENERATED");
+        foreach (PropertiesGAMA p in mapObjects.Keys)
+        {
+            GameObject g = new GameObject(p.id);
+            g.transform.parent = n.transform;
+            foreach (GameObject o in mapObjects[p])
+            {
+                o.transform.parent = g.transform;
 
+            }
         }
         infoWorld = null;
     }
@@ -275,9 +289,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
     {
 
         if (content == null || content.Equals("{}")) return;
-            Debug.Log("firstKey: " + firstKey);
-
-        Debug.Log("content: " + content);
+     
         switch (firstKey)
         {
             // handle general informations about the simulation
@@ -285,9 +297,7 @@ public class GAMAGeometryLoader: ConnectionWithGama
 
                 parameters = ConnectionParameter.CreateFromJSON(content);
                 converter = new CoordinateConverter(parameters.precision, GamaCRSCoefX, GamaCRSCoefY, GamaCRSCoefY, GamaCRSOffsetX, GamaCRSOffsetY, 1.0f);
-
-                Debug.Log("SimulationManager: Received simulation parameters");
-               
+    
                 break;
 
             case "properties":
@@ -317,11 +327,9 @@ public class GAMAGeometryLoader: ConnectionWithGama
 
         if (e.IsText)
         {
-            Debug.Log("e: " + e.Data);
             JObject jsonObj = JObject.Parse(e.Data);
             string type = (string)jsonObj["type"];
-            Debug.Log("type: " + type);
-
+         
             if (type.Equals("json_output"))
             {
                 JObject content = (JObject)jsonObj["contents"];
@@ -339,7 +347,6 @@ public class GAMAGeometryLoader: ConnectionWithGama
                     };
                    
                     SendExecutableAsk("send_init_data", args);
-                    Debug.Log("SimulationManager: send_init_data");
 
                 }
             }

@@ -47,13 +47,11 @@ public class PolygonGenerator
             Vector2 p = converter.fromGAMACRS2D(points[i], points[i + 1]);
             pts.Add(p);
         }
-        Debug.Log("pts: " + pts.Count);
         Vector2[] MeshDataPoints = pts.ToArray();
         //Color32 col = new Color32(BitConverter.GetBytes(prop.color[0])[0], BitConverter.GetBytes(prop.color[1])[0],
          //          BitConverter.GetBytes(prop.color[2])[0], BitConverter.GetBytes(prop.color[3])[0]);
         Color32 col = new Color32(BitConverter.GetBytes(prop.red)[0], BitConverter.GetBytes(prop.green)[0],
                  BitConverter.GetBytes(prop.blue)[0], BitConverter.GetBytes(prop.alpha)[0]);
-        Debug.Log("col: " + col);
         // GameObject p = GeneratePolygon(pts.ToArray(), geom.names.Count > 0 ?  geom.names[cpt] : "", geom.tags.Count > 0 ?  geom.tags[cpt] : "", geom.heights[cpt], geom.hasColliders[cpt], geom.is3D[cpt]);
         return GeneratePolygon(name, MeshDataPoints, ((float) prop.height) / precision, col);
        
@@ -67,12 +65,10 @@ public class PolygonGenerator
         bool isOutlineRendered = true;
         bool is3D = extrusionHeight != 0.0;
 
-        Debug.Log("is3D: " + is3D);
-
+       
         // create new GameObject (as a child)
         GameObject polyExtruderGO = new GameObject();
-        Debug.Log("polyExtruderGO: " + polyExtruderGO);
-
+       
 
         // reference to setup example poly extruder 
         PolyExtruder polyExtruder;
@@ -80,8 +76,7 @@ public class PolygonGenerator
         
         // add PolyExtruder script to newly created GameObject and keep track of its reference
         polyExtruder = polyExtruderGO.AddComponent<PolyExtruder>();
-        Debug.Log("polyExtruder: " + polyExtruder);
-
+       
         // global PolyExtruder configurations
         polyExtruder.isOutlineRendered = isOutlineRendered;
         Vector3 pos = polyExtruderGO.transform.position;
