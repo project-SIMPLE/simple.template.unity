@@ -8,16 +8,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 55daccc09a3b69647bbab145b54a3ab3
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Startup Menu.unity
     guid: fba6476e9c9b14afe9a8c87e93375ad1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/IP Menu.unity
     guid: a6898870ea3a74b8eaf4ae0815720f93
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Multi Player Game/Main Scene.unity
     guid: 1674894583a01490bb0a3c627edb0884
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/End of Game Menu.unity
     guid: 931173f81a7164b55a0e2f094ac25ae8
   - enabled: 0
@@ -26,7 +26,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/TestInteraction.unity
     guid: bca1c2232beba4d3b8933c3720dd9d8c
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Code Example/User Interactions.unity
     guid: 1f2c4c5c9509f4744af09a9eb04d6229
   - enabled: 0

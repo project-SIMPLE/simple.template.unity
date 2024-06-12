@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-public class ConnectionWithGama
+public class ConnectionWithGama : MonoBehaviour
 {
     protected string ip;
     protected string port;

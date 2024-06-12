@@ -5,7 +5,7 @@ using UnityEditor;
 public class GAMAGeometryLoaderUI : EditorWindow
 {
     public string ip = "localhost";
-    public string port = "1000";
+    public string port = "8080"; 
     public float GamaCRSCoefX = 1.0f;
     public float GamaCRSCoefY = 1.0f;
     public float offsetYBackgroundGeom = 0.0f;
